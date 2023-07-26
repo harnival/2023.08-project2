@@ -1,0 +1,57 @@
+.homeBox {
+    max-width: 1280px;
+    background-color: #eee;
+    height: 100vh;
+    margin: auto;
+}
+
+.h_feed{
+    height: 100%;
+}
+.h_f_list{
+    width: 80%;
+    margin: auto;
+    background-color: white;
+}
+.h_f_c_account {
+    height: max(3rem, 8vh);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    position: relative;
+}
+
+.h_f_c_acc_avatar {
+    height: 90%;
+    aspect-ratio: 1/1;
+    border: 1px solid #666;
+    border-radius: 50%;
+}
+.h_f_c_acc_name span{
+    font-size: 80%;
+    color: #444;
+}
+.h_f_c_acc_sub {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    font-size: 80%;
+    color: #444;
+}
+.h_f_c_text {
+    min-height: 1rem;
+    width: 90%;
+    margin: auto;
+    padding: 0.5rem 0;
+}
+.h_f_c_image {
+    height: 50vh;
+}
+.h_f_c_image img{
+    height: 50vh;
+}
+
+.h_f_comment {
+    background-color: #eee;
+}
