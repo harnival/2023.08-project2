@@ -12,6 +12,10 @@
     width: 80%;
     margin: auto;
     background-color: white;
+    display: flex;
+}
+.h_f_content {
+    width: 75%;
 }
 .h_f_c_account {
     height: max(3rem, 8vh);
@@ -34,8 +38,6 @@
 .h_f_c_acc_sub {
     position: absolute;
     right: 0;
-    top: 0;
-    height: 100%;
     font-size: 80%;
     color: #444;
 }
@@ -53,5 +55,140 @@
 }
 
 .h_f_comment {
-    background-color: #eee;
+    background-color: #666;
+    width: 35%;
+    position: relative;
+}
+.h_f_com_unit {
+    border-bottom: 1px solid #eee;
+}
+.h_f_com_u_account {
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+.h_f_com_u_avatar {
+    height: 90%;
+    aspect-ratio: 1/1;
+    border: 1px solid #666;
+    border-radius: 50%;
+}
+.h_f_com_u_time {
+    font-size: 80%;
+    color: #444;
+    position: absolute;
+    right: 0;
+}
+.h_f_com_u_text{
+    width: 90%;
+    margin: auto;
+    padding: 0.5rem 0;
+}
+.h_f_com_input {
+    position: absolute;
+    bottom: 0;
+    height: 3rem;
+    background-color: tomato;
+    width: 100%;
+}
+
+/* ==================================================================== */
+
+@media screen and (max-width: 1023px) {
+    .homeBox {
+        width: 100%;
+        background-color: #eee;
+        height: 100vh;
+        margin: auto;
+    }
+    .h_feed{
+        height: 100%;
+    }
+    .h_f_list{
+        width: 80%;
+        margin: auto;
+        background-color: white;
+        display: block;
+    }
+    .h_f_content {
+        width: 100%;
+    }
+    .h_f_c_account {
+        height: max(3rem, 8vh);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        position: relative;
+    }
+    
+    .h_f_c_acc_avatar {
+        height: 90%;
+        aspect-ratio: 1/1;
+        border: 1px solid #666;
+        border-radius: 50%;
+    }
+    .h_f_c_acc_name span{
+        font-size: 80%;
+        color: #444;
+    }
+    .h_f_c_acc_sub {
+        position: absolute;
+        right: 0;
+        font-size: 80%;
+        color: #444;
+    }
+    .h_f_c_text {
+        min-height: 1rem;
+        width: 90%;
+        margin: auto;
+        padding: 0.5rem 0;
+    }
+    .h_f_c_image {
+        height: 50vh;
+    }
+    .h_f_c_image img{
+        height: 50vh;
+    }
+    
+    .h_f_comment {
+        background-color: #666;
+        width: 100%;
+        position: relative;
+        max-height: 40vh;
+    }
+    .h_f_com_unit {
+        border-bottom: 1px solid #eee;
+    }
+    .h_f_com_u_account {
+        height: 3rem;
+        display: flex;
+        align-items: center;
+        position: relative;
+    }
+    .h_f_com_u_avatar {
+        height: 90%;
+        aspect-ratio: 1/1;
+        border: 1px solid #666;
+        border-radius: 50%;
+    }
+    .h_f_com_u_time {
+        font-size: 80%;
+        color: #444;
+        position: absolute;
+        right: 0;
+    }
+    .h_f_com_u_text{
+        width: 90%;
+        margin: auto;
+        padding: 0.5rem 0;
+    }
+    .h_f_com_input {
+        position: absolute;
+        bottom: 0;
+        height: 3rem;
+        background-color: tomato;
+        width: 100%;
+    }
+    
 }
