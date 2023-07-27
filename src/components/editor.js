@@ -1,6 +1,6 @@
 import { useEffect , useState} from 'react'
 import '../css/editor.css'
-
+import html2canvas from 'html2canvas';
 
 export default function Editor(){
     // 특정 요소에서 마우스 이벤트 캐치 //
@@ -126,13 +126,27 @@ export default function Editor(){
         setshapes(state => [...shapes, null])
         console.log(shapes)
     }
+
+    // ==================================
+    const [imgs, setimgs] = useState();
+    const captureElement = function(){
+        const elem = document.getElementById('elementToCapture')
+        if(elem){
+            html2canvas(elem).then((canvas) => {
+                const image = canvas.toDataURL('image/png');
+                console.log(image);
+                setimgs(state => image);
+            })
+        }
+    }
   return(
     <div id="editorBox">
         <div className="btnBox">
             <button onClick={(e) => {e.preventDefault(); addText()}}>text</button>
             <button onClick={(e) => {e.preventDefault(); addShape()}}>shape</button>
+            <button onClick={() => captureElement()}>ddddd</button>
         </div>
-        <div className="contentsBox">
+        <div className="contentsBox" id='elementToCapture'>
             <div className="cb_text">
                 {textList.map((v,i) => (
                     <textarea name={"textarea_" + i} key={"textarea_" + i} className='cb_text_input'
@@ -147,6 +161,9 @@ export default function Editor(){
                     })}
             </div>
             <div className="can" onMouseEnter={()=>mouseUpCan(true)}></div>
+        </div>
+        <div>
+            <img src={imgs} alt="" />
         </div>
     </div>
   )

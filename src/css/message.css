@@ -1,0 +1,57 @@
+.messageBox {
+    max-width: 1280px;
+    background-color: white;
+    margin: auto;
+    display: flex;
+    height: 100vh;
+}
+.m_list {
+    width: 30%;
+    background-color: #666;
+    height: 100%;
+}
+.m_l_category {
+    height: max(3rem, 6vh);
+    border-bottom: 1px solid #eee;
+}
+.m_l_category ul {
+    display: flex;
+    align-items: center;
+}
+.m_talkbox {
+    flex: 1;
+    background-color: #eee;
+    position: relative;
+}
+.m_t_account {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: max(3rem, 6vh);
+    background-color: tomato;
+}
+.m_t_a_profile {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+.m_t_a_p_image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 90%;
+    aspect-ratio: 1/1;
+    border: 1px solid #666;
+    border-radius: 50%;
+}
+.m_t_input {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    background-color: tomato;
+}
+.m_t_text{
+    display: flex;
+    height: 5rem;
+}

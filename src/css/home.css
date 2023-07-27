@@ -1,10 +1,37 @@
 .homeBox {
     max-width: 1280px;
     background-color: #eee;
-    height: 100vh;
+    /* height: 100vh; */
     margin: auto;
 }
-
+.h_new{
+    width: 80%;
+    margin: auto;
+    background-color: #aaa;
+    padding: 1rem;
+    box-sizing: border-box;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.h_new form {
+    width: 100%;
+}
+.h_new textarea{
+    resize: none;
+    width: 100%;
+    padding: 1em;
+    box-sizing: border-box;
+    height: 10em;
+    font-size: 100%;
+}
+.h_new_door {
+    position: absolute;
+    top: 100%;
+    background-color: aqua;
+    z-index: 1000;
+}
 .h_feed{
     height: 100%;
 }
@@ -49,9 +76,47 @@
 }
 .h_f_c_image {
     height: 50vh;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: center;
 }
-.h_f_c_image img{
+.h_f_c_image_left ,
+.h_f_c_image_right {
+    position: absolute;
+    border: 0;
+    width: 3rem;
+    aspect-ratio: 1/1;
+    font-size: 0px;
+    cursor: pointer;
+}
+.h_f_c_image_left {
+    left: 0;
+    background: white;
+}
+.h_f_c_image_right {
+    right: 0;
+    background: white;
+} 
+.h_f_c_image_slide{
+    display: flex;
+    transition: .3s ease;
+}
+.h_f_c_image_unit {
     height: 50vh;
+    width: calc( 100vw * 0.8 * 0.75);
+    max-width: calc( 1280px * 0.8 * 0.75 );
+    min-width: 50vh;
+    background-color: black;
+    border: 1px solid blue;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.h_f_c_image_unit img{
+    height: 100%;
 }
 
 .h_f_comment {
@@ -94,7 +159,7 @@
 }
 
 /* ==================================================================== */
-
+/* 
 @media screen and (max-width: 1023px) {
     .homeBox {
         width: 100%;
@@ -191,4 +256,4 @@
         width: 100%;
     }
     
-}
+} */
