@@ -3,12 +3,16 @@ import Editor from './components/editor';
 import { useEffect, useState } from 'react'
 import {BrowserRouter as Router, Routes, Route, Link} from 'react-router-dom'
 
+import {useFirestore} from './datasource/firebase';
+import { collection, doc, getDocs } from 'firebase/firestore';
 
 export default function App(){
   const [mainState, setmainState] = useState('Home');
   const changeMainState = function(val){
     setmainState(state => val);
   }
+
+
   return(
     <div id="app">
         <Router>
@@ -17,8 +21,8 @@ export default function App(){
           <div className="header_group"></div>
         </div>
         <div className="mainIn">
-          <Editor />
-          {/* <Main mainState={mainState} /> */}
+          {/* <Editor /> */}
+          <Main mainState={mainState} />
         </div>
         <div className="subNavIn">
           <button onClick={(e)=> {e.preventDefault(); changeMainState('Home')}}>홈</button>

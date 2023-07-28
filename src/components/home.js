@@ -163,11 +163,13 @@ export default function Home(){
                                                 <div className="h_f_com_u_text">{v.text}</div>
                                             </li>
                                         ))}
+                                        <li className="h_f_com_input">
+                                            <div>
+                                                <input type="text" />
+                                                <button>submit</button>
+                                            </div>
+                                        </li>
                                     </ul>
-                                    <div className="h_f_com_input">
-                                        <input type="text" />
-                                        <button>submit</button>
-                                    </div>
                                 </div>
                             </li>
                         ))}

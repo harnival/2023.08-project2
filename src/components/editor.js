@@ -60,7 +60,7 @@ export default function Editor(){
                 keyval = false
             })
         })
-    },[])
+    })
 
     // useEffect(function(){
     //   // 마우스로 요소 이동 //
@@ -105,18 +105,22 @@ export default function Editor(){
         const q = e.target;
         q.classList.add('text_active');
         q.classList.remove('text_done','text_empty')
+        q.removeAttribute('disabled');
+        q.focus()
     }
+    
     const textBlur = function(e){
         const q = e.target;
         q.classList.add('text_done');
         q.classList.remove('text_active','text_empty')
+        q.setAttribute('disabled',true);
     }
     const textchange = function(e,i){
         const q = e.target;
         const val = q.value;
         settextList(state => {
             const w = [...state];
-            w[i] = {value : val}
+            w[i] = {...w[i] , value : val}
             return w
         })
     }
@@ -124,7 +128,6 @@ export default function Editor(){
     const [shapes, setshapes] = useState([]);
     const addShape = function(){
         setshapes(state => [...shapes, null])
-        console.log(shapes)
     }
 
     // ==================================
@@ -134,7 +137,6 @@ export default function Editor(){
         if(elem){
             html2canvas(elem).then((canvas) => {
                 const image = canvas.toDataURL('image/png');
-                console.log(image);
                 setimgs(state => image);
             })
         }
@@ -147,19 +149,18 @@ export default function Editor(){
             <button onClick={() => captureElement()}>ddddd</button>
         </div>
         <div className="contentsBox" id='elementToCapture'>
-            <div className="cb_text">
                 {textList.map((v,i) => (
-                    <textarea name={"textarea_" + i} key={"textarea_" + i} className='cb_text_input'
-                    onDoubleClick={(e) => textDbcl(e)} onBlur={(e) => textBlur(e)} onInput={(e) => textchange(e,i)}
-                    disabled={true} onMouseDown={()=>{mouseOverMain(true)}}></textarea>
+                    <div key={"textarea_" + i}>
+                        <textarea name={"textarea_" + i}  className='cb_text_input'
+                        onDoubleClick={(e) => textDbcl(e)} onBlur={(e) => textBlur(e)} onInput={(e) => textchange(e,i)}
+                        onMouseDown={()=>{mouseOverMain(true)}} autoFocus={true} 
+                        ></textarea>
+                    </div>
                 ))}
-            </div>
-            <div className="cb_sticker">
                 <div className="mainboxbox" onMouseDown={()=>{mouseOverMain(true)}}></div>
-                    {shapes.map((v,i)=>{
-                        return(<div key={"shape_"+i} className="mainboxbox" onMouseDown={()=>{mouseOverMain(true)}}></div>)
-                    })}
-            </div>
+                {shapes.map((v,i)=>{
+                    return(<div key={"shape_"+i} className="mainboxbox" onMouseDown={()=>{mouseOverMain(true)}}></div>)
+                })}
             <div className="can" onMouseEnter={()=>mouseUpCan(true)}></div>
         </div>
         <div>

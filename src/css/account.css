@@ -1,0 +1,140 @@
+.accountBox {
+    max-width: 1280px;
+    width: 100%;
+    min-height: 100vh;
+    background-color: #eee;
+    margin: auto;
+    display: flex;
+}
+
+.acc_info {
+    width: 30%;
+    background-color: tomato;
+}
+
+/* ------------------------------------------ */
+.acc_feed {
+    width: 70%;
+}
+.acc_f_list {
+    width: 90%;
+    margin: auto;
+}
+.acc_f_c_account {
+    height: max(3rem, 8vh);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    position: relative;
+}
+.acc_f_c_acc_avatar {
+    height: 90%;
+    aspect-ratio: 1/1;
+    border: 1px solid #666;
+    border-radius: 50%;
+}
+.acc_f_c_acc_name span{
+    font-size: 80%;
+    color: #444;
+}
+.acc_f_c_acc_sub {
+    position: absolute;
+    right: 0;
+    font-size: 80%;
+    color: #444;
+}
+.acc_f_c_text {
+    min-height: 1rem;
+    width: 90%;
+    margin: auto;
+    padding: 0.5rem 0;
+}
+.acc_f_c_image {
+    height: 50vh;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.acc_f_c_image_left ,
+.acc_f_c_image_right {
+    position: absolute;
+    border: 0;
+    width: 3rem;
+    aspect-ratio: 1/1;
+    font-size: 0px;
+    cursor: pointer;
+}
+.acc_f_c_image_left {
+    left: 0;
+    background: white;
+}
+.acc_f_c_image_right {
+    right: 0;
+    background: white;
+} 
+.acc_f_c_image_slide{
+    display: flex;
+    transition: .3s ease;
+}
+.acc_f_c_image_unit {
+    height: 50vh;
+    width: calc( 100vw * 0.7 * 0.9);
+    max-width: calc( 1280px * 0.7 * 0.9 );
+    min-width: 50vh;
+    background-color: black;
+    border: 1px solid blue;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.acc_f_c_image_unit img{
+    height: 100%;
+}
+.acc_f_comment {
+    background-color: white;
+    position: relative;
+    height: 30vh;
+    overflow-y: auto;
+}
+.acc_f_comment ul {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
+}
+.acc_f_com_unit {
+    border-bottom: 1px solid #eee;
+}
+.acc_f_com_u_account {
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+.acc_f_com_u_avatar {
+    height: 90%;
+    aspect-ratio: 1/1;
+    border: 1px solid #666;
+    border-radius: 50%;
+}
+.acc_f_com_u_time {
+    font-size: 80%;
+    color: #444;
+    position: absolute;
+    right: 0;
+}
+.acc_f_com_u_text{
+    width: 90%;
+    margin: auto;
+    padding: 0.5rem 0;
+}
+.acc_f_com_input {
+    position: sticky;
+    bottom: 0;
+    height: 3rem;
+    background-color: tomato;
+    width: 100%;
+}

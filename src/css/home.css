@@ -122,7 +122,9 @@
 .h_f_comment {
     background-color: #666;
     width: 35%;
+    height: 100%;
     position: relative;
+    overflow-y: auto;
 }
 .h_f_com_unit {
     border-bottom: 1px solid #eee;
@@ -150,8 +152,14 @@
     margin: auto;
     padding: 0.5rem 0;
 }
+.h_f_comment ul {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
+}
 .h_f_com_input {
-    position: absolute;
+    position: sticky;
     bottom: 0;
     height: 3rem;
     background-color: tomato;
