@@ -1,0 +1,73 @@
+.groupBox {
+    max-width: 1280px;
+    background-color: #eee;
+    margin: auto;
+}
+.g_search {
+    height: 4rem;
+    display: flex;
+    justify-content: center;
+}
+.g_s_inputBox {
+    border-left: 1px solid black;
+    border-right: 1px solid black;
+    width: 50%;
+}
+.g_s_inputBox input {
+    border: 0;
+    background-color: transparent;
+    height: 100%;
+    width: 100%;
+    font-size: 100%;
+    padding: 0 1rem;
+    box-sizing: border-box;
+    outline-color: #666;
+}
+.g_s_inputBox input::placeholder {
+    font-size: 80%;
+}
+.g_s_btn {
+    border-right: 1px solid black;
+    width: 4rem;
+}
+.g_s_btn button {
+    display: block;
+    height: 100%;
+    width: 100%;
+    border: 0;
+    background-color: transparent;
+    cursor: pointer;
+    transition: .3s ease;
+}
+.g_s_btn button:hover {
+    background-color: rgb(0,0,0,0.2);
+}
+
+.g_b_my ul,
+.g_b_popular ul {
+    display: flex;
+    flex-wrap: wrap;
+}
+.g_b_my_list{
+    width: calc(100% / 3);
+    box-sizing: border-box;
+
+    display: flex;
+    padding: 0 2rem;
+}
+.g_b_my_img {
+    width: 50%;
+    aspect-ratio: 1/1;
+    background-color: yellow;
+    position: relative;
+}
+.g_b_my_alarm {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 1rem;
+    aspect-ratio: 1/1;
+    border-radius: 50%;
+    background-color: red;
+    color: white;
+}
