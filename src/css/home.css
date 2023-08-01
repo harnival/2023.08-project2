@@ -40,9 +40,10 @@
     margin: auto;
     background-color: white;
     display: flex;
+    margin-bottom: 2rem;
 }
 .h_f_content {
-    width: 75%;
+    width: 65%;
 }
 .h_f_c_account {
     height: max(3rem, 8vh);
@@ -105,8 +106,8 @@
 }
 .h_f_c_image_unit {
     height: 50vh;
-    width: calc( 100vw * 0.8 * 0.75);
-    max-width: calc( 1280px * 0.8 * 0.75 );
+    width: calc( 100vw * 0.8 * 0.65);
+    max-width: calc( 1280px * 0.8 * 0.65 );
     min-width: 50vh;
     background-color: black;
     border: 1px solid blue;
@@ -122,12 +123,20 @@
 .h_f_comment {
     background-color: #666;
     width: 35%;
-    height: 100%;
     position: relative;
-    overflow-y: auto;
+    /* display: flex;
+    align-items: end; */
+}
+
+.h_f_com_like {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    background-color: #666;
 }
 .h_f_com_unit {
     border-bottom: 1px solid #eee;
+    width: 100%;
 }
 .h_f_com_u_account {
     height: 3rem;
@@ -153,10 +162,13 @@
     padding: 0.5rem 0;
 }
 .h_f_comment ul {
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: end;
+    padding-top: 3rem;
+    box-sizing: border-box;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    overflow-y: scroll;
 }
 .h_f_com_input {
     position: sticky;

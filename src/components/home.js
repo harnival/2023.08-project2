@@ -31,10 +31,151 @@ export default function Home(){
             user_image : null,
             text : 'sample comment text 2',
             time : 22222222
-            }
+            },{
+                user_id : 'sample comment id 2',
+                user_image : null,
+                text : 'sample comment text 2',
+                time : 22222222
+                },{
+                    user_id : 'sample comment id 2',
+                    user_image : null,
+                    text : 'sample comment text 2',
+                    time : 22222222
+                    },{
+                        user_id : 'sample comment id 2',
+                        user_image : null,
+                        text : 'sample comment text 2',
+                        time : 22222222
+                        },{
+                            user_id : 'sample comment id 2',
+                            user_image : null,
+                            text : 'sample comment text 2',
+                            time : 22222222
+                            },{
+                                user_id : 'sample comment id 2',
+                                user_image : null,
+                                text : 'sample comment text 2',
+                                time : 22222222
+                                },{
+                                    user_id : 'sample comment id 2',
+                                    user_image : null,
+                                    text : 'sample comment text 2',
+                                    time : 22222222
+                                    }
         ],
         like : 15
-    }]
+    },{
+        time : 123456789,
+        user_name : 'sample name',
+        user_id : 'sample id',
+        user_photo : null,
+        text : 'sample text---',
+        image : [
+            '/img/sample1.jpg',
+            '/img/sample2.jpg',
+            '/img/sample3.png',
+            '/img/sample4.jpg'
+        ],
+        comment : [{
+            user_id : 'sample comment id 1',
+            user_image : null,
+            text : 'sample comment text 1',
+            time : 123456789
+            },{
+            user_id : 'sample comment id 2',
+            user_image : null,
+            text : 'sample comment text 2',
+            time : 22222222
+            },{
+                user_id : 'sample comment id 2',
+                user_image : null,
+                text : 'sample comment text 2',
+                time : 22222222
+                },{
+                    user_id : 'sample comment id 2',
+                    user_image : null,
+                    text : 'sample comment text 2',
+                    time : 22222222
+                    },{
+                        user_id : 'sample comment id 2',
+                        user_image : null,
+                        text : 'sample comment text 2',
+                        time : 22222222
+                        },{
+                            user_id : 'sample comment id 2',
+                            user_image : null,
+                            text : 'sample comment text 2',
+                            time : 22222222
+                            },{
+                                user_id : 'sample comment id 2',
+                                user_image : null,
+                                text : 'sample comment text 2',
+                                time : 22222222
+                                },{
+                                    user_id : 'sample comment id 2',
+                                    user_image : null,
+                                    text : 'sample comment text 2',
+                                    time : 22222222
+                                    }
+        ],
+        like : 15
+    },{
+        time : 123456789,
+        user_name : 'sample name',
+        user_id : 'sample id',
+        user_photo : null,
+        text : 'sample text---',
+        image : [
+            '/img/sample1.jpg',
+            '/img/sample2.jpg',
+            '/img/sample3.png',
+            '/img/sample4.jpg'
+        ],
+        comment : [{
+            user_id : 'sample comment id 1',
+            user_image : null,
+            text : 'sample comment text 1',
+            time : 123456789
+            },{
+            user_id : 'sample comment id 2',
+            user_image : null,
+            text : 'sample comment text 2',
+            time : 22222222
+            },{
+                user_id : 'sample comment id 2',
+                user_image : null,
+                text : 'sample comment text 2',
+                time : 22222222
+                },{
+                    user_id : 'sample comment id 2',
+                    user_image : null,
+                    text : 'sample comment text 2',
+                    time : 22222222
+                    },{
+                        user_id : 'sample comment id 2',
+                        user_image : null,
+                        text : 'sample comment text 2',
+                        time : 22222222
+                        },{
+                            user_id : 'sample comment id 2',
+                            user_image : null,
+                            text : 'sample comment text 2',
+                            time : 22222222
+                            },{
+                                user_id : 'sample comment id 2',
+                                user_image : null,
+                                text : 'sample comment text 2',
+                                time : 22222222
+                                },{
+                                    user_id : 'sample comment id 2',
+                                    user_image : null,
+                                    text : 'sample comment text 2',
+                                    time : 22222222
+                                    }
+        ],
+        like : 15
+    }
+]
     const userData = {
         name : 'sample name',
         id : 'sample id',
@@ -75,7 +216,8 @@ export default function Home(){
                     slide.style.transform = `translateX(-${n * slide.offsetWidth / len}px)`
                 }
             })
-
+            // const hei = v.querySelector(".h_f_content").offsetHeight;
+            // v.querySelector(".h_f_comment ul").style.height = hei;
         })
     },[])
     return(
@@ -141,15 +283,6 @@ export default function Home(){
                                     </div>
                                 </div>
                                 <div className="h_f_comment">
-                                    <div className="h_f_com_like">
-                                        <div>
-                                            <button type='button'>likes</button>
-                                            <span>{v.like}</span>
-                                        </div>
-                                        <div>
-                                            <button type='button'>send</button>
-                                        </div>
-                                    </div>
                                     <ul>
                                         {v.comment.map((v,i) => (
                                             <li className="h_f_com_unit" key={"comment_"+i}>
@@ -170,6 +303,15 @@ export default function Home(){
                                             </div>
                                         </li>
                                     </ul>
+                                    <div className="h_f_com_like">
+                                        <div>
+                                            <button type='button'>likes</button>
+                                            <span>{v.like}</span>
+                                        </div>
+                                        <div>
+                                            <button type='button'>send</button>
+                                        </div>
+                                    </div>  
                                 </div>
                             </li>
                         ))}
