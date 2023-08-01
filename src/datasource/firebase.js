@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore, doc, updateDoc, serverTimestamp, setDoc, collection, addDoc, arrayUnion, getDoc } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
+import { getAuth, signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import store from "../store/store";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCsNJnVVExrSm0CHOpX2C-12FkaoOu6dH4",
@@ -15,6 +16,32 @@ const app = initializeApp(firebaseConfig);
 const useFirestore = getFirestore(app),
       useAuth = getAuth(app);
 
+// 로그인 //
+const userLogin = function(email,pwd){
+  signInWithEmailAndPassword(useAuth,email,pwd)
+  .then((userCred) => {
+    const user = userCred.user;
+    const uid = user.uid;
+    return uid
+  }).then(uid => {
+    const userDb = doc(useFirestore,'account', uid)
+    getDoc(userDb).then(snapshot => {
+      const data = snapshot.data();
+      store.dispatch({type: 'setCurrentUser_Login', info : data})
+    })
+  })
+  .catch((err) => {
+    console.log("[error code]", err.code)
+    console.log("[error message]", err.message)
+  })
+}
+// 로그아웃 //
+const userLogout = function(){
+  signOut(useAuth)
+  .then(() => {
+    store.dispatch({type : 'setCurrentUser_Logout'})
+  })
+}
 
 // 메세지 송신 (input submit event)//
 const sendMessage = function(page,uid,info){
@@ -29,7 +56,7 @@ const MessagePage = function(selectId, uid, page){
   })
 }
 
-// 회원가입 //
+// 회원가입 시 정보 저장//
 const registUser = function(uid,info){
   const dbRef = doc(useFirestore, 'account', uid)
   setDoc(dbRef, info);
@@ -60,4 +87,4 @@ const addComment = async function(post, uid, body){
   }
 }
 
-export {useFirestore, useAuth, sendMessage, registUser, feedPosting, addComment};
+export {useFirestore, useAuth, sendMessage, registUser, feedPosting, addComment, userLogin, userLogout};

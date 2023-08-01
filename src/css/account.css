@@ -100,10 +100,15 @@
     overflow-y: auto;
 }
 .acc_f_comment ul {
-    height: 100vh;
     display: flex;
     flex-direction: column;
     justify-content: end;
+}
+.acc_f_com_like {
+    position: sticky;
+    top: 0;
+    width: 100%;
+    background-color: tomato;
 }
 .acc_f_com_unit {
     border-bottom: 1px solid #eee;
