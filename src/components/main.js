@@ -7,7 +7,6 @@ import Search from "./search"
 
 import '../css/main.css'
 // -----------------------------------------
-import { useState } from "react"
 
 // -----------------------------------------
 export default function Main(props){

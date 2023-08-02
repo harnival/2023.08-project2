@@ -56,10 +56,16 @@ const MessagePage = function(selectId, uid, page){
   })
 }
 
-// 회원가입 시 정보 저장//
-const registUser = function(uid,info){
-  const dbRef = doc(useFirestore, 'account', uid)
-  setDoc(dbRef, info);
+// 회원가입 & 정보 저장//
+const registUser = function(info){
+  const infos = info['info'];
+  const subInfos = info['subInfo'];
+  signInWithEmailAndPassword(useAuth, infos.email, infos.pwd)
+  .then((userCred) => {
+    const user = userCred.user;
+    const dbRef = doc(useFirestore, 'account', user.uid)
+    setDoc(dbRef, subInfos);
+  })
 }
 
 // 글 게시 //
