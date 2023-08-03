@@ -1,6 +1,6 @@
 import { redirect } from "react-router-dom"
 import { doc, collection, getDocs, query, where } from "firebase/firestore";
-import { useFirestore } from "../datasource/firebase";
+import { useFirestore, registUser, useAuth, findEmail } from "../datasource/firebase";
 import { useState, useRef, useEffect, useMemo } from "react";
 
 import '../css/signin.css';
@@ -11,17 +11,18 @@ export default function Signin(){
     // 페이지 넘버 //
     const [pageNumber, setpageNumber] = useState(1)
     const goToPage = function(n){
-        setpageNumber(state => n)
+        setpageNumber(n)
     }
+    useEffect(function(){
+        if(pageNumber === 0) {
+            registUser(infoData.current)
+        }
+    },[pageNumber])
     // --------------------//
-
-    const [infoData, setinfoData] = useState({
-        infoForAuth : {},
-        InfoForDatabase : {}
+    const infoData = useRef({
+        info : {},
+        subInfo : {}
     })
-
-    const [sampleRef, setsampleRef] = useState(false)
-
     const inputInfo = function(event){
         event.preventDefault();
         const q = event.target;
@@ -29,48 +30,82 @@ export default function Signin(){
         const data = Object.fromEntries(w.entries());
 
         if(pageNumber === 1){
-            if( data.email && data.pwd ){
-                setinfoData(state => ({...state, infoForAuth : {...data} }));
-            } else if (!data.email) {
-
-            }
-        }
-
+            const r = infoData.current.info
+            infoData.current.info = {...r, ...data};
+            console.log(infoData.current.info)
+            goToPage(2)
+        } else if(pageNumber === 2){
+            const r = infoData.current.subInfo
+            infoData.current.subInfo = {...r, ...data};
+            console.log(infoData.current)
+            goToPage(3)
+        } else if(pageNumber === 3){
+            const r = infoData.current.subInfo
+            infoData.current.subInfo = {...r, ...data};
+            console.log(infoData.current)
+            goToPage(4)
+        } else if(pageNumber === 4){
+            const r = infoData.current.subInfo
+            infoData.current.subInfo = {...r, ...data};
+            console.log(infoData.current)
+            goToPage(0)
+        } 
     }
-
-    // 프로필 사진 업로드 //
-    const [avatar, setavatar] = useState();
-    const imageInput = async function(event){
-        const loader = event.target.files[0];
-        const reader = new FileReader();
-        reader.readAsDataURL(loader);
-        reader.onload = function(val){
-            setavatar(state => val.target.result)
-        }
-    }
-    let fileInput = useRef()
-    const clickToImage = function(event){
-        event.preventDefault();
-        fileInput.click();
-    }
-    // -------------------- //
-
-    
-
+   
     // components ----------------------------------------------------------------- //
     const Info1 = function(){
+        const [requiredAuth, setrequiredAuth] = useState({
+            email : null,
+            pwd : false,
+            pwdConfirm : null,
+        })
+        const checkValue = function(e){
+            e.preventDefault();
+            const q = e.target;
+            const w = new FormData(q);
+            const data = Object.fromEntries(w.entries());
+            
+            if( !data.email ){
+                setrequiredAuth(state => ({...state, email : 1}))
+            } else {
+                const dataDb = collection(useFirestore, 'account');
+                const getQuery = query(dataDb, where('email','==',data.email));
+                getDocs(getQuery)
+                .then( snapshot => {
+                    const dataArr = snapshot.docs;
+                    console.log(dataArr, !dataArr.length)
+                    if(dataArr.length){
+                        setrequiredAuth(state => ({...state, email : 2}))
+                    } else {
+                        if( !data.pwd ){
+                            setrequiredAuth(state => ({...state, pwd : true}))
+                        } else if( !data.pwd_confirm ){
+                            setrequiredAuth(state => ({...state, pwdConfirm : 1}))
+                        } else if( data.pwd !== data.pwd_confirm ){
+                            setrequiredAuth(state => ({...state, pwdConfirm : 2}))
+                        } else {
+                            inputInfo(e)
+                        }
+                    }
+                })    
+            }
+        }
         return(            
-            <form className="ip_requireBox" >
+            <form className="ip_requireBox" onSubmit={(e) => checkValue(e)}>
                 <div className="signin_inputBox">
-                        <p className={'sampleClass' + (sampleRef? ' sampleTrue' : '') }>ddddddddddd</p>
-                    <div className="signin_ltf use_border" >
-                        <input type="email" placeholder="이메일" name="email" onFocus={() => setsampleRef(state => !state)} onBlur={() => {setsampleRef(state => !state)}}/>
+                    <div className={"signin_ltf use_border" + (requiredAuth.email? " requiredRef" : "")} >
+                        <input type="email" placeholder="이메일" name="email" onFocus={() => setrequiredAuth({...requiredAuth, email : null})}/>
+                        {requiredAuth.email == 1? (<p>이메일을 입력해주세요.</p>) : null}
+                        {requiredAuth.email == 2? (<p>이미 등록된 이메일입니다.</p>) : null}
                     </div>
-                    <div className="signin_ltf use_border" >
-                        <input type="password" name="pwd" placeholder="비밀번호"/>
+                    <div className={"signin_ltf use_border" + (requiredAuth.pwd? " requiredRef" : "")} >
+                        <input type="password" name="pwd" placeholder="비밀번호" onFocus={() => setrequiredAuth({...requiredAuth, pwd : false})}/>
+                        {requiredAuth.pwd? (<p>비밀번호를 입력해주세요.</p>) : null}
                     </div>
-                    <div className="signin_ltf">
-                        <input type="password" name="pwd_confirm" placeholder="비밀번호 확인"/>
+                    <div className={"signin_ltf " + (requiredAuth.pwdConfirm? " requiredRef" : "")}>
+                        <input type="password" name="pwd_confirm" placeholder="비밀번호 확인" onFocus={() => setrequiredAuth({...requiredAuth, pwdConfirm : null})}/>
+                        {requiredAuth.pwdConfirm == 1? (<p>확인란을 입력해주세요.</p>) : null}
+                        {requiredAuth.pwdConfirm == 2? (<p>비밀번호가 일치하지 않습니다.</p>) : null}
                     </div>
                 </div>
                 <div className="signin_btn">
@@ -82,16 +117,16 @@ export default function Signin(){
             </form>
         )
     }
-    const QQQ = useMemo(Info1);
     function Info2(){
         return(
-            <form className="ip_idBox">
+            <form className="ip_idBox" onSubmit={(e) => inputInfo(e)}>
                 <h4>ID 입력</h4>
                 <div className="ip_input_ltf">
                     <span>@</span>
                     <input type="text" name="id" placeholder="ID"/>
                 </div>
                 <p>* 영문 대문자 / 소문자 / 숫자 / '.', '_' 만 가능</p>
+                <p>* 미입력 시, 자동으로 ID가 생성됩니다. ID는 설정에서 수정할 수 있습니다.</p>
                 <div className="ip_idBox_btn">
                     <button>건너뛰기</button>
                     <button>다음</button>
@@ -100,14 +135,34 @@ export default function Signin(){
         )
     }
     function Info3(){
+        const [descNum, setdescNum] = useState(0)
+        const changeNum = function(e){
+            const q = e.target.value;
+            setdescNum(q.length)
+        }
+
+        const [requiredInfo, setrequiredInfo] = useState(false)
+        const checkValue = function(e){
+            e.preventDefault();
+            const q = e.target;
+            const w = new FormData(q);
+            const data = Object.fromEntries(w.entries());
+            if(!data.name){
+                setrequiredInfo(true)
+            } else {
+                inputInfo(e)
+            }
+        }
         return(
-            <form className="ip_nameBox" >
+            <form className="ip_nameBox" onSubmit={(e) => checkValue(e)}>
                 <h4>프로필 입력</h4>
-                <div className="ip_input_ltf">
-                    <input type="text" name="name"/>
+                <div className={"signin_ltf use_border" + (requiredInfo? " requiredRef" : "")}>
+                    <input type="text" name="name" placeholder="프로필 이름 (20자 이내)" maxLength={20}/>
+                    {requiredInfo? (<p>프로필 이름을 입력해주십시오.</p>) : null}
                 </div>
                 <div className="ip_input_ltf">
-                    <textarea name="description" maxLength={200}></textarea>
+                    <textarea name="description" maxLength={150} onInput={(e) => changeNum(e)} placeholder="프로필 작성"></textarea>
+                    <span className="ip_desc_number">{descNum}/150</span>
                 </div>
                 <div className="ip_nameBox_btn">
                     <button>다음</button>
@@ -116,8 +171,24 @@ export default function Signin(){
         )
     }
     function Info4(){
+        // 프로필 사진 업로드 //
+        const [avatar, setavatar] = useState();
+        const imageInput = async function(event){
+            const loader = event.target.files[0];
+            const reader = new FileReader();
+            reader.readAsDataURL(loader);
+            reader.onload = function(val){
+                setavatar(state => val.target.result)
+            }
+        }
+        let fileInput = useRef()
+        const clickToImage = function(event){
+            event.preventDefault();
+            fileInput.click();
+        }
+        // -------------------- //
         return(
-            <form className="ip_imageBox" >
+            <form className="ip_imageBox" onSubmit={(e) => inputInfo(e)}>
                 <h4>프로필 사진 선택</h4>
                 <div>
                     <div className="ip_img_wrap">
@@ -127,6 +198,7 @@ export default function Signin(){
                         <input type="hidden" name="photoURL" value={avatar? avatar : ''}/>
                     </div>
                     <p>
+                        <span>- 미입력 시, 기본 이미지가 입력됩니다.</span>
                         <span>- 설정 탭에서 언제든 수정할 수 있습니다.</span>
                     </p>
                 </div>
@@ -151,7 +223,7 @@ export default function Signin(){
                         <div className="bar_step4"></div>
                     </div>
                     <div className="ip_fw_content">
-                        {pageNumber === 1? ( <QQQ />
+                        {pageNumber === 1? ( <Info1 inputInfo={inputInfo}/>
                         ) :pageNumber === 2? ( <Info2 />
                         ): pageNumber === 3? ( <Info3 />
                         ): pageNumber === 4? ( <Info4 />

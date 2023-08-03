@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore, doc, updateDoc, serverTimestamp, setDoc, collection, addDoc, arrayUnion, getDoc } from 'firebase/firestore';
-import { getAuth, signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import { getFirestore, doc, updateDoc, serverTimestamp, setDoc, collection, addDoc, arrayUnion, getDoc, query, where, getDocs } from 'firebase/firestore';
+import { getAuth, signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword, getUserByEmail } from 'firebase/auth';
 import store from "../store/store";
 
 const firebaseConfig = {
@@ -59,12 +59,29 @@ const MessagePage = function(selectId, uid, page){
 // 회원가입 & 정보 저장//
 const registUser = function(info){
   const infos = info['info'];
-  const subInfos = info['subInfo'];
-  signInWithEmailAndPassword(useAuth, infos.email, infos.pwd)
+  const subInfos = {...info['subInfo']};
+
+  createUserWithEmailAndPassword(useAuth, infos.email, infos.pwd)
   .then((userCred) => {
     const user = userCred.user;
-    const dbRef = doc(useFirestore, 'account', user.uid)
-    setDoc(dbRef, subInfos);
+    const generals = {
+      ...subInfos,
+      id : (!subInfos.id? user.uid : subInfos.id),
+      email : infos.email,
+      uid : user.uid
+    }
+    setDoc(doc(useFirestore,'account', user.uid),{
+      general : generals,
+      group : [],
+      message : [],
+      post : [],
+      comment : [],
+      follower : [],
+      like : []
+    })
+  })
+  .catch(err => {
+    console.log("[create error]",err.code,"---",err.message)
   })
 }
 

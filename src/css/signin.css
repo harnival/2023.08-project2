@@ -71,6 +71,9 @@
     white-space:nowrap;
 }
 /* ---------------- */
+.ip_input_ltf { 
+    position: relative;
+}
 .ip_input_ltf input{
     border : 0;
     background-color: #666;
@@ -97,6 +100,17 @@
     background: #ccc;
 }
 
-.sampleTrue {
-    background-color: black;
+.requiredRef {
+    background-color: turquoise;
+}
+.ip_desc_number {
+    display: block;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+}
+
+.ip_nameBox textarea {
+    padding: 1em;
+    resize: none;
 }

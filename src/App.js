@@ -6,32 +6,33 @@ import {Routes, Route, Link, redirect, useNavigate} from 'react-router-dom'
 
 import {useAuth, useFirestore, userLogout} from './datasource/firebase';
 import { onAuthStateChanged } from 'firebase/auth'
-import { collection, doc, getDocs } from 'firebase/firestore';
+import {  doc, getDoc } from 'firebase/firestore';
 import store from './store/store';
 
 export default function App(){
+  const navigate = useNavigate();
   const [mainState, setmainState] = useState('Home');
   const changeMainState = function(val){
     setmainState(state => val);
   }
-
-  const navigate = useNavigate();
   useEffect(function(){
     onAuthStateChanged(useAuth,(user) => {
       if(user){
-        console.log("[currentUser]",useAuth.currentUser)
-        navigate('/')
+        const userDb = doc(useFirestore, 'account', user.uid);
+        getDoc(userDb).then(snapshot => {
+          const data = snapshot.data();
+          store.dispatch({type : 'setCurrentUser_Login' , info : data})
+          console.log("[currentUser]",useAuth.currentUser)
+          navigate('/')
+        })
       } else {
+        store.dispatch({type : 'setCurrentUser_Logout'})
         console.log("[currentUser] logout")
         navigate('/login')
       }    
     })
-  },[])  
-  // 로그인 시 정보 갱신 //
-  store.subscribe(function(){
-    console.log('[user info]', store.getState().setCurrentUser)
-  })
-
+  },[])
+  
   const MainPage = function(){
     return(
       <div>
@@ -56,7 +57,7 @@ export default function App(){
 
 
   return(
-    <div id="app">
+    <div id="app" key={Date.now()}>
       <button onClick={() => userLogout()}>qqqqq</button>
       <Routes>
         <Route path='/login' element={<Login />}></Route>
