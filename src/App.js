@@ -9,6 +9,8 @@ import { onAuthStateChanged } from 'firebase/auth'
 import {  doc, getDoc } from 'firebase/firestore';
 import store from './store/store';
 
+import './css/mainpage.css';
+
 export default function App(){
   const navigate = useNavigate();
   const [mainState, setmainState] = useState('Home');
@@ -35,7 +37,7 @@ export default function App(){
   
   const MainPage = function(){
     return(
-      <div>
+      <div id='mainPage'>
         <div className="headerIn">
           <div className="header_account"></div>
           <div className="header_group"></div>
@@ -45,11 +47,18 @@ export default function App(){
           <Main mainState={mainState} />
         </div>
         <div className="subNavIn">
-          <button onClick={(e)=> {e.preventDefault(); changeMainState('Home')}}>홈</button>
-          <button onClick={(e)=> {e.preventDefault(); changeMainState('Search')}}>검색</button>
-          <button onClick={(e)=> {e.preventDefault(); changeMainState('Group')}}>그룹</button>
-          <button onClick={(e)=> {e.preventDefault(); changeMainState('Message')}}>메세지</button>
-          <button onClick={(e)=> {e.preventDefault(); changeMainState('Account')}}>내 계정</button>
+          <ul>
+            {/* <li><button onClick={(e)=> {e.preventDefault(); changeMainState('Home')}}>홈</button></li>
+            <li><button onClick={(e)=> {e.preventDefault(); changeMainState('Search')}}>검색</button></li>
+            <li><button onClick={(e)=> {e.preventDefault(); changeMainState('Group')}}>그룹</button></li>
+            <li><button onClick={(e)=> {e.preventDefault(); changeMainState('Message')}}>메세지</button></li>
+            <li><button onClick={(e)=> {e.preventDefault(); changeMainState('Account')}}>내 계정</button></li> */}
+            <li><Link to='/home'>홈</Link></li>
+            <li><Link to='/search'>검색</Link></li>
+            <li><Link to='/group'>그룹</Link></li>
+            <li><Link to='/message'>메세지</Link></li>
+            <li><Link to='/account'>내 계정</Link></li>
+          </ul>
         </div>
       </div>
     )
@@ -62,7 +71,7 @@ export default function App(){
       <Routes>
         <Route path='/login' element={<Login />}></Route>
         <Route path='/signin' element={<Signin />}></Route>
-        <Route path='/' element={<MainPage />}></Route>
+        <Route path='/*' element={<MainPage />}></Route>
       </Routes>
     </div>
   )
