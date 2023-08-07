@@ -1,123 +1,20 @@
-import { getDoc, onSnapshot, doc } from 'firebase/firestore';
+import { getDoc, onSnapshot, doc, query, collection, orderBy, getDocs } from 'firebase/firestore';
 import '../css/account.css'
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useAuth, useFirestore } from '../datasource/firebase';
+import { useParams } from 'react-router-dom';
 
 export default function Account(props){
-    const uid = props.userID;
-    const userInfo = useRef({
+    let {userID} = useParams();
+    const [userInfo, setuserInfo] = useState({
         name : null,
         photoURL : null,
         id : null,
-        uid : props.userID,
-    });
-    
-
-    const sampleData = [{
-        time : 123456789,
-        user_name : 'sample name',
-        user_id : 'sample id',
-        user_photo : null,
-        text : 'sample text---',
-        image : [
-            '/img/sample1.jpg',
-            '/img/sample2.jpg',
-            '/img/sample3.png',
-            '/img/sample4.jpg'
-        ],
-        comment : [{
-            user_id : 'sample comment id 1',
-            user_image : null,
-            text : 'sample comment text 1',
-            time : 123456789
-            },{
-            user_id : 'sample comment id 2',
-            user_image : null,
-            text : 'sample comment text 2',
-            time : 22222222
-            }
-        ],
-        like : 15
-    },{
-        time : 123456789,
-        user_name : 'sample name',
-        user_id : 'sample id',
-        user_photo : null,
-        text : 'sample text---',
-        image : [
-            '/img/sample1.jpg',
-            '/img/sample2.jpg',
-            '/img/sample3.png',
-            '/img/sample4.jpg'
-        ],
-        comment : [{
-            user_id : 'sample comment id 1',
-            user_image : null,
-            text : 'sample comment text 1',
-            time : 123456789
-            },{
-            user_id : 'sample comment id 2',
-            user_image : null,
-            text : 'sample comment text 2',
-            time : 22222222
-            }
-        ],
-        like : 15
-    },{
-        time : 123456789,
-        user_name : 'sample name',
-        user_id : 'sample id',
-        user_photo : null,
-        text : 'sample text---',
-        image : [
-            '/img/sample1.jpg',
-            '/img/sample2.jpg',
-            '/img/sample3.png',
-            '/img/sample4.jpg'
-        ],
-        comment : [{
-            user_id : 'sample comment id 1',
-            user_image : null,
-            text : 'sample comment text 1',
-            time : 123456789
-            },{
-            user_id : 'sample comment id 2',
-            user_image : null,
-            text : 'sample comment text 2',
-            time : 22222222
-            }
-        ],
-        like : 15
-    },{
-        time : 123456789,
-        user_name : 'sample name',
-        user_id : 'sample id',
-        user_photo : null,
-        text : 'sample text---',
-        image : [
-            '/img/sample1.jpg',
-            '/img/sample2.jpg',
-            '/img/sample3.png',
-            '/img/sample4.jpg'
-        ],
-        comment : [{
-            user_id : 'sample comment id 1',
-            user_image : null,
-            text : 'sample comment text 1',
-            time : 123456789
-            },{
-            user_id : 'sample comment id 2',
-            user_image : null,
-            text : 'sample comment text 2',
-            time : 22222222
-            }
-        ],
-        like : 15
-    }]
-
+        uid : userID,
+    })
     const [callPost, setcallPost] = useState([])    // 게시물 불러오기
     const [openUserMenu, setopenUserMenu] = useState(false) // 유저 메뉴 온오프
-
+    const [existID, setexistID] = useState(false)
 
     useEffect(function(){
          // 게시물 미디어 슬라이드 //
@@ -150,7 +47,6 @@ export default function Account(props){
             const btn2 = document.querySelector(".acc_i_a_btn1 button");
             const qqq = function(e){
                 if(!btn.includes(e.target) && btn2 !== e.target){
-                    console.log(e.target)
                     setopenUserMenu(false)
                 }
             }
@@ -161,61 +57,55 @@ export default function Account(props){
         }
     },[openUserMenu])
     useEffect(function(){
-        getDoc(doc(useFirestore,'account',uid))
+
+        getDoc(doc(useFirestore,'account', userID))
         .then(snapshot => {
-            const data = snapshot.data();
-            userInfo.current.name = data.general.name;
-            userInfo.current.photoURL = data.general.photoURL;
-            userInfo.current.id = data.general.id;
+            if(snapshot.data()){
+                const data = snapshot.data();
+                setuserInfo(state => ({
+                    name : data.general.name,
+                    photoURL : data.general.photoURL? data.general.photoURL : null,
+                    id : data.general.id,
+                    uid : userID,        
+                }))
+            }else {
+                console.log("fsdfsdfsdf")
+            }
         })
-       
-        // 게시물 실시간 감시 //
-        const firstLoad = function(){
-            getDoc(doc(useFirestore,'account', uid))
-            .then(snapshot => snapshot.data())
-            .then(data =>
-                data.post.map(async(v) => {
-                    const data1db = doc(useFirestore,'posts', v);
-                    const data1 = await getDoc(data1db);
-                    const data2 = data1.data()
-                        data2.user_name = data.general.name
-                        data2.user_photo = data.general.photoURL
-                        data2.user_id = data.general.id
-                        console.log("[onFirst]",data2)
-                    return data2
-                })
-            ).then(data => setcallPost(data))
-        }
-        firstLoad()
-        onSnapshot(doc(useFirestore,'account', uid), async (docData) => {
+    },[userID])
+    useEffect(function(){
+        onSnapshot(doc(useFirestore,'account', userID), async (docData) => {
             const postData = docData.data();
             const newData = await Promise.all(
                 postData.post.map(async(v) => {
                     const data1 = await getDoc(doc(useFirestore,'posts',v))
                     const data2 = data1.data()
-                        data2.user_name = postData.general.name
-                        data2.user_photo = postData.general.photoURL
-                        data2.user_id = postData.general.id
-                    console.log("[onsnapshot]",data2)
-                    return data2
+                    const data3 = {...data2,
+                        user_name : postData.general.name,
+                        user_photo : postData.general.photoURL,
+                        user_id : postData.general.id
+                    }
+                    console.log("[onsnapshot]",data3)
+                    return data3
                 })
             )
             setcallPost(newData)
         })
-    },[])
+    },[userID])
+
     return(
         <div id="account">
             <div className="accountBox">
                 <div className="acc_info">
                     <div className="acc_i_account">
                         <div className="acc_i_a_avatar">
-                            <img src={userInfo.current.photoURL} />
+                            <img src={userInfo.photoURL} />
                         </div>
                         <div className="acc_i_a_name">
-                            <p className="acc_i_a_n_name">{userInfo.current.name}</p>
-                            <p className="acc_i_a_n_id">@{userInfo.current.id}</p>
+                            <p className="acc_i_a_n_name">{userInfo.name}</p>
+                            <p className="acc_i_a_n_id">@{userInfo.id}</p>
                             <p className="acc_i_a_n_follow"></p>
-                                {uid == useAuth.currentUser.uid?(
+                                {userID == useAuth.currentUser.uid?(
                                     <div className="acc_i_a_btn1">
                                         <button type="button" onClick={() => setopenUserMenu(state => !state)}>사용자 메뉴</button>
                                         {openUserMenu && (
@@ -232,7 +122,7 @@ export default function Account(props){
                                        </div>
                                     )}
                         </div>
-                        {uid !== useAuth.currentUser.uid? (
+                        {userID !== useAuth.currentUser.uid? (
                             <div className="acc_i_followBtn">
                                 <a href="/#">follow</a>
                                 <a href="/#">cancel follow</a>

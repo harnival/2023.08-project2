@@ -6,21 +6,21 @@ import Group from "./group"
 import Search from "./search"
 import { useAuth } from "../datasource/firebase"
 
-import { Route, Routes } from "react-router-dom"
+import { Route, Routes, useParams } from "react-router-dom"
 import '../css/main.css'
 // -----------------------------------------
 
 // -----------------------------------------
 export default function Main(props){
-    
+    let {userID} = useParams();
     return(
         <div id="mainBox">
             <Routes>
-                <Route path="/home"></Route>
-                <Route path="/search"></Route>
-                <Route path="/group/*"></Route>
-                <Route path="/message/*"></Route>
-                <Route path="/account/"></Route>
+                <Route path="/" element={<Home />}></Route>
+                <Route path="search" element={<Search />}></Route>
+                <Route path="group/*" element={<Group />}></Route>
+                <Route path="message/*" element={<Message />}></Route>
+                <Route path={`account/:userID`} element={<Account />}></Route>
             </Routes>
         </div>
         // <div id="mainBox">
