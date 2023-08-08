@@ -2,35 +2,38 @@ import { useEffect, useRef, useState } from 'react'
 import '../css/group.css'
 import { BrowserRouter as Router, Routes, Link, Route, useParams, useNavigate } from 'react-router-dom'
 import { useAuth, useFirestore } from '../datasource/firebase'
-import { collection, doc,getDoc, onSnapshot, query, where} from 'firebase/firestore';
+import { collection, doc,getDoc, getDocs, onSnapshot, query, where} from 'firebase/firestore';
 import store from '../store/store';
+import GroupUnit from './groupUnit'
 
 export default function Group(){
     const uid = useAuth.currentUser.uid
     const [callGroup, setcallGroup] = useState([]);
-    const [checkLength, setcheckLength] = useState({})
 
-    useEffect(function(){
-        const w = store.getState().setCurrentUser.group;
-
-        w.forEach(v => {
-            const q = query(collection(useFirestore,'posts'),where('group','==',v));
-            const arrs = [];
-            const unsubscribe = onSnapshot(q,(doc) => {
-                doc.docChanges().forEach(v => console.log(v))
-            })
-        })
+    useEffect(function(){   //그룹 게시물 변화 감시
+        const checkChange = async function(){
+            const w = Object.keys(store.getState().setCurrentUser.group);
+            
+        }
+        checkChange()
     },[])
 
-    useEffect(async function(){
-        const w = store.getState().setCurrentUser.group;
-        const ee = await Promise.all(w.map(async (v) => {
-            const snapshot = await getDoc(doc(useFirestore,'groups',v));
-            const data = snapshot.data()
-            return {...data, id : v}
-        }))
-        const rr = setcallGroup(state => ([...ee]))
+    useEffect(function(){ //초기 그룹 입력
+        async function callFirst(){
+            const w = Object.keys(store.getState().setCurrentUser.group);
+            const ee = await Promise.all(w.map(async (v) => {
+                const snapshot = await getDoc(doc(useFirestore,'groups',v));
+                const data = snapshot.data()
+                return {...data, id : v}
+            }))
+            setcallGroup(state => ([...ee]))
+        }
+        callFirst()
     },[])
+
+    const makeGroup = function(){
+        
+    }
     function GroupMain(){
         return(
             <div className="g_b_main">
@@ -38,10 +41,12 @@ export default function Group(){
                     <h3>내가 참여한 그룹</h3>
                     <ul>
                         {callGroup.map(v => (
-                        <li className='g_b_my_list'>
+                        <li className='g_b_my_list' key={`group_${v.id}`}>
                             <div className="g_b_my_img">
                                 <div className="g_b_img_wrap">
-                                    <img src={v.photoURL? v.photoURL : null}/>
+                                    <Link to={`${v.id}`} state={{title : v.title}}>
+                                        <img src={v.photoURL? v.photoURL : null}/>
+                                    </Link>
                                 </div>
                                 <div className="g_b_my_alarm"></div>
                             </div>
@@ -81,6 +86,9 @@ export default function Group(){
     return(
         <div id="group">
             <div className="groupBox">
+                <div className="q_new">
+
+                </div>
                 <div className="g_search">
                     <div className="g_s_inputBox">
                         <input type="text" name='search' placeholder='검색어를 입력하세요.'/>
@@ -91,9 +99,8 @@ export default function Group(){
                 </div>
                 <div className="g_body">
                     <Routes>
-                        <Route path='/' element={<GroupMain />}>
-                            <Route path='/e'></Route>
-                        </Route>
+                        <Route path='/' element={<GroupMain />}></Route>
+                        <Route path=':groupID' element={<GroupUnit />}></Route>
                     </Routes>
                 </div>
             </div>

@@ -1,8 +1,8 @@
-import { getDoc, onSnapshot, doc, query, collection, orderBy, getDocs } from 'firebase/firestore';
+import { getDoc, onSnapshot, doc, query, collection, orderBy, getDocs, where, addDoc, updateDoc, arrayUnion } from 'firebase/firestore';
 import '../css/account.css'
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useAuth, useFirestore } from '../datasource/firebase';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate, Navigate } from 'react-router-dom';
 
 export default function Account(props){
     let {userID} = useParams();
@@ -41,7 +41,7 @@ export default function Account(props){
                 })
          }
     },[callPost])
-    useEffect(function(){
+    useEffect(function(){   // 유저 메뉴 온오프 //
         if(openUserMenu){
             const btn = [...document.querySelectorAll(".acc_i_a_b_menu a")];
             const btn2 = document.querySelector(".acc_i_a_btn1 button");
@@ -56,8 +56,8 @@ export default function Account(props){
             }
         }
     },[openUserMenu])
-    useEffect(function(){
 
+    useEffect(function(){   // 유저 정보 로드
         getDoc(doc(useFirestore,'account', userID))
         .then(snapshot => {
             if(snapshot.data()){
@@ -68,30 +68,67 @@ export default function Account(props){
                     id : data.general.id,
                     uid : userID,        
                 }))
-            }else {
-                console.log("fsdfsdfsdf")
+            } else {
+                console.log("ddddddd")
             }
         })
     },[userID])
-    useEffect(function(){
-        onSnapshot(doc(useFirestore,'account', userID), async (docData) => {
-            const postData = docData.data();
-            const newData = await Promise.all(
-                postData.post.map(async(v) => {
-                    const data1 = await getDoc(doc(useFirestore,'posts',v))
-                    const data2 = data1.data()
-                    const data3 = {...data2,
-                        user_name : postData.general.name,
-                        user_photo : postData.general.photoURL,
-                        user_id : postData.general.id
+
+    const setPost = async function(){   // 피드 로드
+        const q = query(collection(useFirestore,'posts'),where('uid','==',userID));
+        const data1 = onSnapshot(q, async(snapshotDoc) => {
+            const dataArr1 = await Promise.all(
+                snapshotDoc.docs.map(async(v) => {
+                    const time = v.data().time.seconds * 1000;
+                    const timeObj = {
+                        year : new Date(time).getFullYear(),
+                        month : new Date(time).getMonth() +1,
+                        date : new Date(time).getDate(),
+                        hour : new Date(time).getHours() <10? "0"+new Date(time).getHours() : new Date(time).getHours(),
+                        minute : new Date(time).getMinutes() <10? "0"+new Date(time).getMinutes() : new Date(time).getMinutes(),
                     }
-                    console.log("[onsnapshot]",data3)
-                    return data3
+                    const data1 = await getDoc(doc(useFirestore,'account',v.data().uid))
+                    const data2 = data1.data()
+                    return ({...v.data(), user_name : data2.general.name, user_id : data2.general.id , user_photo : data2.general.photoURL, time : timeObj});
                 })
             )
-            setcallPost(newData)
+            const dataArr2 = [...dataArr1].sort((a,b) => a.time.seconds - b.time.seconds)
+            setcallPost(state => dataArr2)
         })
+    }
+    useEffect(function(){
+        setPost()
     },[userID])
+    useEffect(function(){
+        return () => setPost()
+    },[])
+
+    const sendMessage = function(){
+        if(userID == useAuth.currentUser.uid){
+            const q = query(collection(useFirestore,'messages'),where('user','array-contains',userID),where('user','array-contains',useAuth.currentUser.uid));
+            getDocs(q)
+            .then(async(snapshotDoc) => {
+                const docs = snapshotDoc.docs;
+                const arr1 = docs.map(v => v.data()).filter(v => v.user.length == 2);
+                if (!arr1.length){
+                    const addMessage = await addDoc(collection(useFirestore,'messages'),{
+                        contents : [],
+                        user : [
+                            userID,
+                            useAuth.currentUser.uid
+                        ]
+                    })
+                    updateDoc(doc(useFirestore,'account',userID),{
+                        message : arrayUnion(addMessage.id)
+                    })
+                    updateDoc(doc(useFirestore,'account', useAuth.currentUser.uid),{
+                        message : arrayUnion(addMessage.id)
+                    })
+                    Navigate(`/message/${addMessage.id}`);
+                }
+            })
+        }
+    }
 
     return(
         <div id="account">
@@ -111,7 +148,7 @@ export default function Account(props){
                                         {openUserMenu && (
                                             <ul className="acc_i_a_b_menu">
                                                 <li><a href='/#' onClick={(e) => e.preventDefault()}>follow</a></li>
-                                                <li><a href='/#' onClick={(e) => e.preventDefault()}>send message</a></li>
+                                                <li><a href='/#' onClick={(e) => {e.preventDefault(); sendMessage()}}>send message</a></li>
                                                 <li><a href='/#' onClick={(e) => e.preventDefault()}>group</a></li>
                                                 <li><a href='/#' onClick={(e) => e.preventDefault()}>block</a></li>
                                             </ul>
@@ -144,17 +181,17 @@ export default function Account(props){
                                                 <span>@{v['user_id']}</span>
                                             </div>
                                         <div className="acc_f_c_acc_sub">
-                                            <span>{v.time}</span>
+                                            <span>{`${v.time.year}년 ${v.time.month}월 ${v.time.date}일 ${v.time.hour}시 ${v.time.minute}분`}</span>
                                             <div>
                                                 <button type='button'>옵션</button>
                                             </div>
                                         </div>
                                     </div>
                                     <div className="acc_f_c_text">{v.text}</div>
-                                    {v.image? (
+                                    {!!v.media.length? (
                                         <div className="acc_f_c_image">
                                             <div className="acc_f_c_image_slide">
-                                                {v.image.map((v,i) => ( 
+                                                {v.media.map((v,i) => ( 
                                                     <div key={i} className="acc_f_c_image_unit">
                                                         <img src={v}/> 
                                                     </div>))}
