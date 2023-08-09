@@ -129,17 +129,11 @@
 }
 
 .h_f_comment {
-    background-color: #666;
     width: 35%;
-    position: relative;
-    /* display: flex;
-    align-items: end; */
+    height: 50vh;
 }
 
 .h_f_com_like {
-    position: absolute;
-    top: 0;
-    width: 100%;
     background-color: #666;
 }
 .h_f_com_unit {
@@ -169,18 +163,19 @@
     margin: auto;
     padding: 0.5rem 0;
 }
-.h_f_comment ul {
-    padding-top: 3rem;
-    box-sizing: border-box;
+.h_f_com_lists {
     height: 100%;
+    position: relative;
+    flex: 1;
+    overflow: auto;
+    display: flex;
+    flex-direction: column-reverse;
+}
+.h_f_com_lists ul {
     width: 100%;
     position: absolute;
-    bottom: 0;
-    overflow-y: scroll;
 }
 .h_f_com_input {
-    position: sticky;
-    bottom: 0;
     height: 3rem;
     background-color: tomato;
     width: 100%;

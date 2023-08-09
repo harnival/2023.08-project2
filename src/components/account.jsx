@@ -22,7 +22,7 @@ export default function Account(props){
             const lists = document.querySelectorAll(".acc_f_c_image");
                 lists.forEach((v,i) => {
                     let n=0;
-                    v.querySelector(".acc_f_c_image_left").addEventListener('click',function(){
+                    v.querySelector(".acc_f_c_image_right").addEventListener('click',function(){
                         const slide = v.querySelector(".acc_f_c_image_slide");
                         const len = v.querySelectorAll(".acc_f_c_image_unit").length
                         if(n < len-1){
@@ -30,7 +30,7 @@ export default function Account(props){
                             slide.style.transform = `translateX(-${n * slide.offsetWidth / len}px)`
                         }
                     })
-                    v.querySelector(".acc_f_c_image_right").addEventListener('click',function(){
+                    v.querySelector(".acc_f_c_image_left").addEventListener('click',function(){
                         const slide = v.querySelector(".acc_f_c_image_slide");
                         const len = v.querySelectorAll(".acc_f_c_image_unit").length
                         if(n > 0){

@@ -39,6 +39,8 @@ export default function App(){
     return(
       <div id='app'>
         <div className="headerIn">
+        <button onClick={() => userLogout()}>qqqqq</button>
+
           <div className="header_account"></div>
           <div className="header_group"></div>
         </div>
@@ -60,11 +62,9 @@ export default function App(){
   } else {
     return(
       <div id="app" key={Date.now()}>
-        <button onClick={() => userLogout()}>qqqqq</button>
           <Routes>
             <Route path='/login' element={<Login />}></Route>
             <Route path='/signin' element={<Signin />}></Route>
-            {/* <Route path='/*' element={<MainPage />}></Route> */}
           </Routes>
       </div>
     )

@@ -10,46 +10,68 @@ export default function Home(){
 
     const [feedLoading, setfeedLoading] = useState(true)
     const [totalFeed, settotalFeed] = useState([])
+    const [addPost, setaddPost] = useState()
+
     
-    useEffect(function(){   // 피드 로딩
+    const getPosts = async function(){
         const myGroup = Object.keys(store.getState().setCurrentUser.group)
         const myFollower = store.getState().setCurrentUser.follower;
-            myFollower.push(useAuth.currentUser.uid);
-        const getPosts = async function(){
-            const q = query(collection(useFirestore,'posts'),or(
+        myFollower.push(useAuth.currentUser.uid);
+        const q = !myGroup.length ? (
+            query(collection(useFirestore,'posts'),where('uid', 'in', myFollower))
+        ) : (
+            query(collection(useFirestore,'posts'),or(
                 where('group','in', myGroup),
-                where('uid', 'in', myFollower)
-            ));
-            const snapshots = await getDocs(q);
-            const dataArr = await Promise.all(
-                snapshots.docs.map(async(v) => {
-                    const time = v.data().time.seconds * 1000;
-                    const timeObj = {
-                        year : new Date(time).getFullYear(),
-                        month : new Date(time).getMonth() +1,
-                        date : new Date(time).getDate(),
-                        hour : new Date(time).getHours() <10? "0"+new Date(time).getHours() : new Date(time).getHours(),
-                        minute : new Date(time).getMinutes() <10? "0"+new Date(time).getMinutes() : new Date(time).getMinutes(),
-                    }
-                    const data1 = await getDoc(doc(useFirestore,'account',v.data().uid))
-                    const data2 = data1.data()
-                    
-                    return ({...v.data(), user_name : data2.general.name, user_id : data2.general.id , user_photo : data2.general.photoURL, time : timeObj});
-                })
-            )
-            const dataArr2 = [...dataArr].sort((a,b) => a.time.seconds - b.time.seconds)
-            settotalFeed(state => dataArr2);
-            setfeedLoading(false)
-        }
+                where('uid', 'in',myFollower)
+            ))
+        );
+        const snapshots = await getDocs(q);
+        const dataArr = await Promise.all(
+            snapshots.docs.map(async(v) => {
+                const time = v.data().time.seconds * 1000;
+                const timeObj = {
+                    year : new Date(time).getFullYear(),
+                    month : new Date(time).getMonth() +1,
+                    date : new Date(time).getDate(),
+                    hour : new Date(time).getHours() <10? "0"+new Date(time).getHours() : new Date(time).getHours(),
+                    minute : new Date(time).getMinutes() <10? "0"+new Date(time).getMinutes() : new Date(time).getMinutes(),
+                }
+                const data1 = await getDoc(doc(useFirestore,'account',v.data().uid))
+                const data2 = data1.data()
+                
+                const comments = v.data().comment.map(v => v.uid);
+                if(!!comments.length){
+                    const commentUser = [...new Set(comments)]
+                    const q = query(collection(useFirestore,'account'),where('uid','in',commentUser));
+                    const snapshots = await getDocs(q) 
+                    const userData1 = await Promise.all(
+                        snapshots.docs.map(v => ({
+                            uid : v.id,
+                            name : v.data().name,
+                            photo : v.data().photoURL,
+                            id : v.data().id
+                        }))
+                    )
+                    return ({...v.data(), user_name : data2.general.name, user_id : data2.general.id , user_photo : data2.general.photoURL, time : timeObj, userInfo : userData1});
+                }
+                return ({...v.data(), user_name : data2.general.name, user_id : data2.general.id , user_photo : data2.general.photoURL, time : timeObj});
+
+            })
+        )
+        const dataArr2 = [...dataArr].sort((a,b) => a.time.seconds - b.time.seconds)
+        settotalFeed(state => dataArr2);
+        setfeedLoading(false)
+    }
+    useEffect(function(){   // 피드 로딩
         getPosts()
-    },[])
+    },[addPost])
     
     // 게시물 이미지 슬라이드 //
     useEffect(function(){
         const lists = document.querySelectorAll(".h_f_list");
         lists.forEach((v,i) => {
             let n=0;
-            v.querySelector(".h_f_c_image_left").addEventListener('click',function(){
+            v.querySelector(".h_f_c_image_right").addEventListener('click',function(){
                 const slide = v.querySelector(".h_f_c_image_slide");
                 const len = v.querySelectorAll(".h_f_c_image_unit").length
                 if(n < len-1){
@@ -57,7 +79,7 @@ export default function Home(){
                     slide.style.transform = `translateX(-${n * slide.offsetWidth / len}px)`
                 }
             })
-            v.querySelector(".h_f_c_image_right").addEventListener('click',function(){
+            v.querySelector(".h_f_c_image_left").addEventListener('click',function(){
                 const slide = v.querySelector(".h_f_c_image_slide");
                 const len = v.querySelectorAll(".h_f_c_image_unit").length
                 if(n > 0){
@@ -73,7 +95,7 @@ export default function Home(){
         const q = e.target;
         const formdata = new FormData(q);
         const data = Object.fromEntries(formdata.entries());
-        addDoc(collection(useFirestore,'posts'),{
+        const posting = {
             comment : [],
             group : data.group,
             like: [],
@@ -81,15 +103,17 @@ export default function Home(){
             text: data.text,
             time : serverTimestamp(),
             uid : useAuth.currentUser.uid
-        })
+        }
+        addDoc(collection(useFirestore,'posts'),posting)
         .then(() => {
             showGroup.current.value = ''
             selectGroup.current.value = ''
             textArea.current.value = ''
             setselectImage(state => [])
+            setaddPost(state => posting)
         })
-
     }
+   
     // 이미지 업로드 //
     const [selectImage, setselectImage] = useState([]);
     const postImage = async function(event){
@@ -124,8 +148,11 @@ export default function Home(){
     }
 
     // comment //
-    const setComment = function(){
-        
+    const setComment = function(event){
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        const data = Object.fromEntries(formData.entries());
+
     }
 
 
@@ -217,26 +244,6 @@ export default function Home(){
                                             </div>
                                         </div>
                                         <div className="h_f_comment">
-                                            <ul>
-                                                {v.comment.map((v,i) => (
-                                                    <li className="h_f_com_unit" key={"comment_"+i}>
-                                                        <div className="h_f_com_u_account">
-                                                            <div className="h_f_com_u_avatar">
-                                                                <img src={v['user_image']} />
-                                                            </div>
-                                                            <div className="h_f_com_u_name">@{v['user_id']}</div>
-                                                            <div className="h_f_com_u_time">{v.time}</div>
-                                                        </div>
-                                                        <div className="h_f_com_u_text">{v.text}</div>
-                                                    </li>
-                                                ))}
-                                                <li className="h_f_com_input">
-                                                    <div>
-                                                        <input type="text" />
-                                                        <button>submit</button>
-                                                    </div>
-                                                </li>
-                                            </ul>
                                             <div className="h_f_com_like">
                                                 <div>
                                                     <button type='button'>likes</button>
@@ -245,7 +252,36 @@ export default function Home(){
                                                 <div>
                                                     <button type='button'>send</button>
                                                 </div>
-                                            </div>  
+                                            </div>
+                                            <div className="h_f_com_lists">
+                                                <ul>
+                                                    { !v.comment.length? (
+                                                        <li>댓글이 없습니다</li>
+                                                    ): (
+                                                        v.comment.map((val,idx) => (
+                                                            <li className="h_f_com_unit" key={"comment_"+idx}>
+                                                                <div className="h_f_com_u_account">
+                                                                    <div className="h_f_com_u_avatar">
+                                                                        <img src={v.userInfo.find(v => v.uid === val.uid).photoURL} />
+                                                                    </div>
+                                                                    <div className="h_f_com_u_name">@{v['user_id']}</div>
+                                                                    <div className="h_f_com_u_time">{v.time.seconds}</div>
+                                                                </div>
+                                                                <div className="h_f_com_u_text">{v.text}</div>
+                                                            </li>
+                                                        ))
+                                                    )
+
+                                                    }
+                                                </ul>
+                                            </div>
+                                            <div className="h_f_com_input">
+                                                <div>
+                                                    <input type="text" />
+                                                    <button>submit</button>
+                                                </div>
+                                            </div>
+                                            
                                         </div>
                                     </li>
                                 ))
