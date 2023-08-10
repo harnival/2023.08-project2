@@ -2,9 +2,11 @@ import { getDoc, onSnapshot, doc, query, collection, orderBy, getDocs, where, ad
 import '../css/account.css'
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useAuth, useFirestore } from '../datasource/firebase';
-import { useParams, useNavigate, Navigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 export default function Account(props){
+
+    const navigate = useNavigate();
     let {userID} = useParams();
     const [userInfo, setuserInfo] = useState({
         name : null,
@@ -77,7 +79,7 @@ export default function Account(props){
     const setPost = async function(){   // 피드 로드
         const q = query(collection(useFirestore,'posts'),where('uid','==',userID));
         const data1 = onSnapshot(q, async(snapshotDoc) => {
-            const dataArr1 = await Promise.all(
+            const dataArr = await Promise.all(
                 snapshotDoc.docs.map(async(v) => {
                     const time = v.data().time.seconds * 1000;
                     const timeObj = {
@@ -89,10 +91,30 @@ export default function Account(props){
                     }
                     const data1 = await getDoc(doc(useFirestore,'account',v.data().uid))
                     const data2 = data1.data()
+                    
+                    const comments = v.data().comment.map(v => v.uid);
+                    if(!!comments.length){
+                        const commentUser = [...new Set(comments)]
+                        const userData1 = await Promise.all(
+                            commentUser.map(async(v) => {
+                                const get1 = await getDoc(doc(useFirestore,'account',v));
+                                const get2 = get1.data();
+                                return({
+                                    uid : v,
+                                    name : get2.general.name,
+                                    id : get2.general.id,
+                                    photoURL : get2.general.photoURL
+                                })
+                            })
+                        )
+                        console.log(commentUser)
+                        return ({...v.data(), user_name : data2.general.name, user_id : data2.general.id , user_photo : data2.general.photoURL, time : timeObj, userInfo : userData1});
+                    }
                     return ({...v.data(), user_name : data2.general.name, user_id : data2.general.id , user_photo : data2.general.photoURL, time : timeObj});
+    
                 })
             )
-            const dataArr2 = [...dataArr1].sort((a,b) => a.time.seconds - b.time.seconds)
+            const dataArr2 = [...dataArr].sort((a,b) => a.time.seconds - b.time.seconds)
             setcallPost(state => dataArr2)
         })
     }
@@ -104,13 +126,13 @@ export default function Account(props){
     },[])
 
     const sendMessage = function(){
-        if(userID == useAuth.currentUser.uid){
-            const q = query(collection(useFirestore,'messages'),where('user','array-contains',userID),where('user','array-contains',useAuth.currentUser.uid));
+        if(userID !== useAuth.currentUser.uid){
+            const q = query(collection(useFirestore,'messages'),where('user','in', [[userID, useAuth.currentUser.uid],[useAuth.currentUser.uid, userID]]));
             getDocs(q)
             .then(async(snapshotDoc) => {
                 const docs = snapshotDoc.docs;
-                const arr1 = docs.map(v => v.data()).filter(v => v.user.length == 2);
-                if (!arr1.length){
+                if (!docs.length){
+                    const arr1 = docs.map(v => v.data());
                     const addMessage = await addDoc(collection(useFirestore,'messages'),{
                         contents : [],
                         user : [
@@ -124,7 +146,10 @@ export default function Account(props){
                     updateDoc(doc(useFirestore,'account', useAuth.currentUser.uid),{
                         message : arrayUnion(addMessage.id)
                     })
-                    Navigate(`/message/${addMessage.id}`);
+                    navigate(`/message/${addMessage.id}`);
+                } else {
+                    const arr1 = docs.map(v => v.id);                    
+                    navigate(`/message/${arr1[0]}`);
                 }
             })
         }
@@ -142,7 +167,7 @@ export default function Account(props){
                             <p className="acc_i_a_n_name">{userInfo.name}</p>
                             <p className="acc_i_a_n_id">@{userInfo.id}</p>
                             <p className="acc_i_a_n_follow"></p>
-                                {userID == useAuth.currentUser.uid?(
+                                {userID !== useAuth.currentUser.uid?(
                                     <div className="acc_i_a_btn1">
                                         <button type="button" onClick={() => setopenUserMenu(state => !state)}>사용자 메뉴</button>
                                         {openUserMenu && (
@@ -214,14 +239,14 @@ export default function Account(props){
                                     </div>
                                     <ul>
                                         {v.comment && v.comment.length !== 0? (
-                                            v.comment.map((v,i) => (
+                                            v.comment.map((val,idx) => (
                                                 <li className="acc_f_com_unit" key={"comment_"+i}>
                                                     <div className="acc_f_com_u_account">
                                                         <div className="acc_f_com_u_avatar">
-                                                            <img src={v['user_image']} />
+                                                            <img src={v.userInfo.find(v => v.uid === val.uid).photoURL} />
                                                         </div>
-                                                        <div className="acc_f_com_u_name">@{v['user_id']}</div>
-                                                        <div className="acc_f_com_u_time">{v.time}</div>
+                                                        <div className="acc_f_com_u_name">@{v.userInfo.find(v => v.uid === val.uid).id}</div>
+                                                        <div className="acc_f_com_u_time">{v.time.seconds}</div>
                                                     </div>
                                                     <div className="acc_f_com_u_text">{v.text}</div>
                                                 </li>

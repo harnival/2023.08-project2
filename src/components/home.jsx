@@ -3,7 +3,10 @@ import '../css/home.css'
 import store from '../store/store';
 import {useEffect, useRef, useState} from 'react';
 import { useAuth, useFirestore } from '../datasource/firebase';
+import { useNavigate } from 'react-router-dom';
 export default function Home(){
+    const navigate = useNavigate();
+
     const selectGroup = useRef();
     const showGroup = useRef();
     const textArea = useRef()
@@ -19,7 +22,7 @@ export default function Home(){
         myFollower.push(useAuth.currentUser.uid);
         const q = !myGroup.length ? (
             query(collection(useFirestore,'posts'),where('uid', 'in', myFollower))
-        ) : (
+            ) : (
             query(collection(useFirestore,'posts'),or(
                 where('group','in', myGroup),
                 where('uid', 'in',myFollower)
@@ -42,16 +45,19 @@ export default function Home(){
                 const comments = v.data().comment.map(v => v.uid);
                 if(!!comments.length){
                     const commentUser = [...new Set(comments)]
-                    const q = query(collection(useFirestore,'account'),where('uid','in',commentUser));
-                    const snapshots = await getDocs(q) 
                     const userData1 = await Promise.all(
-                        snapshots.docs.map(v => ({
-                            uid : v.id,
-                            name : v.data().name,
-                            photo : v.data().photoURL,
-                            id : v.data().id
-                        }))
+                        commentUser.map(async(v) => {
+                            const get1 = await getDoc(doc(useFirestore,'account',v));
+                            const get2 = get1.data();
+                            return({
+                                uid : v,
+                                name : get2.general.name,
+                                id : get2.general.id,
+                                photoURL : get2.general.photoURL
+                            })
+                        })
                     )
+                    console.log(commentUser)
                     return ({...v.data(), user_name : data2.general.name, user_id : data2.general.id , user_photo : data2.general.photoURL, time : timeObj, userInfo : userData1});
                 }
                 return ({...v.data(), user_name : data2.general.name, user_id : data2.general.id , user_photo : data2.general.photoURL, time : timeObj});
@@ -258,18 +264,18 @@ export default function Home(){
                                                     { !v.comment.length? (
                                                         <li>댓글이 없습니다</li>
                                                     ): (
-                                                        v.comment.map((val,idx) => (
+                                                        v.comment.map((val,idx) => {return(
                                                             <li className="h_f_com_unit" key={"comment_"+idx}>
                                                                 <div className="h_f_com_u_account">
-                                                                    <div className="h_f_com_u_avatar">
+                                                                    <div className="h_f_com_u_avatar" onClick={(e) => navigate(`/account/${val.uid}`)}>
                                                                         <img src={v.userInfo.find(v => v.uid === val.uid).photoURL} />
                                                                     </div>
-                                                                    <div className="h_f_com_u_name">@{v['user_id']}</div>
+                                                                    <div className="h_f_com_u_name">@{v.userInfo.find(v => v.uid === val.uid).id}</div>
                                                                     <div className="h_f_com_u_time">{v.time.seconds}</div>
                                                                 </div>
                                                                 <div className="h_f_com_u_text">{v.text}</div>
                                                             </li>
-                                                        ))
+                                                        )})
                                                     )
 
                                                     }

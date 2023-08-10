@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import '../css/message.css';
 import MessageUnit from './messageUnit';
 
-import { Routes, Route, Link, useNavigate, Outlet } from 'react-router-dom';
+import { Routes, Route, Link, useNavigate, Outlet, useLocation } from 'react-router-dom';
 import { collection, doc, getDoc, getDocs, onSnapshot, query, where } from 'firebase/firestore';
 import { useAuth, useFirestore } from '../datasource/firebase';
 
@@ -39,26 +39,7 @@ export default function Message(){
             )
             setcallList(state => ([...dataArr1]))
         })
-        // const setList = async function(){
-        //     const snapshots = await getDocs(q)
-        //     const dataArr1 = await Promise.all(
-        //         snapshots.docs.map(async(v) => {
-        //             const timeSort = [...v.data().contents].sort((a,b) => a.time - b.time)
-        //             const userArr = await Promise.all(
-        //                 v.data().user.map(async(val) => {
-        //                     const qq = await getDoc(doc(useFirestore,'account',val))
-        //                     const qq2 = qq.data()
-        //                     const infos = [val , {name : qq2.general.name, photoURL : qq2.general.photoURL, id : qq2.general.id}]
-        //                     return infos
-        //                 })
-        //             )
-        //             console.log(userArr)
-        //             return {...v.data(), contents : timeSort , user : userArr, pageID : v.id}
-        //         })
-        //     )
-        //     setcallList(state => ([...dataArr1])) 
-        // }
-        // setList()
+        
         return () => unsub()
     },[])
 
@@ -92,6 +73,14 @@ export default function Message(){
             navigate(`${id}`, { state : {data : callList.find(v => v.pageID === id)}})
         }
     },[nowPageID])
+    const location = useLocation();
+    useEffect(function(){
+        if( location.pathname.includes('/message/') && nowPageID !== location.pathname.split('/message/')[1]){
+            setnowPageID(state => location.pathname.split('/message/')[1])            
+        }
+    },[location])
+
+    
     return(
         <div id="message">
             <div className="messageBox">
@@ -106,28 +95,30 @@ export default function Message(){
                             {callList.map(v => (
                                 <li key={`message_${v.pageID}`}>
                                     <div className="m_l_box" onClick={(e) => {e.preventDefault(); goToMessage(v.pageID)}}>
-                                            <div className="m_l_infoWrap">
-                                                { v.user.filter(v => v[0] !== useAuth.currentUser.uid).map(v => (
-                                                    <div className="m_l_info" key={`info_${v[0]}`}>
-                                                        <div className="m_l_i_avatars">
-                                                                <img src={v[1].photoURL} />
-                                                        </div>
-                                                        <div className="m_l_i_ids">
-                                                            <p className='ids_name'>{v[1].name}</p>
-                                                            <p className='ids_id'>@{v[1].id}</p>
-                                                        </div>
+                                        <div className="m_l_infoWrap">
+                                            { v.user.filter(v => v[0] !== useAuth.currentUser.uid).map(v => (
+                                                <div className="m_l_info" key={`info_${v[0]}`}>
+                                                    <div className="m_l_i_avatars">
+                                                            <img src={v[1].photoURL} />
                                                     </div>
-                                                )) }
-                                            </div>
-                                        <div className="m_l_preview m_l_p_t_receive">
-                                            <div className="m_l_p_text">
-                                                <p className="m_l_p_t_id">
-                                                    @{v.user.find(val => (val[0] === v.contents[v.contents.length-1].uid))[1].id}
-                                                </p>
-                                                <p className="m_l_p_t_content">
-                                                    {v.contents[v.contents.length-1].text}
-                                                </p>
-                                            </div>
+                                                    <div className="m_l_i_ids">
+                                                        <p className='ids_name'>{v[1].name}</p>
+                                                        <p className='ids_id'>@{v[1].id}</p>
+                                                    </div>
+                                                </div>
+                                            )) }
+                                        </div>
+                                        <div className="m_l_preview">
+                                            {v.contents && !!v.contents.length && (
+                                                <div className="m_l_p_text">
+                                                    <p className="m_l_p_t_id">
+                                                        @{v.user.find(val => (val[0] === v.contents[v.contents.length-1].uid))[1].id}
+                                                    </p>
+                                                    <p className="m_l_p_t_content">
+                                                        {v.contents[v.contents.length-1].text}
+                                                    </p>
+                                                </div>
+                                            ) }
                                         </div>
                                     </div>
                                 </li>
