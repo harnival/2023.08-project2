@@ -9,7 +9,7 @@ import { onAuthStateChanged } from 'firebase/auth'
 import {  doc, getDoc } from 'firebase/firestore';
 import store from './store/store';
 
-import './css/mainpage.css';
+import './css/app.css';
 
 export default function App(){
   const navigate = useNavigate();
@@ -50,11 +50,28 @@ export default function App(){
         </div>
         <div className="subNavIn">
           <ul>
-            <li><Link to='/'>홈</Link></li>
-            <li><Link to='/search'>검색</Link></li>
-            <li><Link to='/group'>그룹</Link></li>
-            <li><Link to='/message'>메세지</Link></li>
-            <li><Link to={`/account/${useAuth.currentUser.uid}`}>내 계정</Link></li>
+            <li onClick={() => navigate(`/account/${useAuth.currentUser.uid}`)}>
+              <div className='myAccount_box'>
+                <img src={store.getState().setCurrentUser.general.photoURL} className='myAccount_icon'/>
+              </div>
+              내 계정
+            </li>
+            <li onClick={() => navigate('/')}>
+              <img src="/img/icons/home.svg" />
+              홈
+            </li>
+            <li onClick={() => navigate('/search')}>
+              <img src="/img/icons/search.svg" />
+              검색
+            </li>
+            <li onClick={() => navigate('/group')}>
+              <img src="/img/icons/group.svg" />
+              그룹
+            </li>
+            <li onClick={() => navigate('/message')}>
+              <img src="/img/icons/message.svg" />
+              메세지
+            </li>
           </ul>
         </div>
       </div>

@@ -1,0 +1,40 @@
+.subNavIn {
+    width: max(5%, 5rem);
+    position: fixed;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+    z-index: 9999;
+    background-color: #eee;
+
+    font-size: 100%;
+}
+.subNavIn li {
+    width: 100%;
+    aspect-ratio: 1/1;
+    padding: max(20%, 1.5rem);
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    font-size: 0px;
+}
+.subNavIn li:hover {
+    background-color: #aaa;
+}
+
+.subNavIn img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+.myAccount_box {
+    background-color: white;
+    border: 1px solid black;
+    border-radius: 20%;
+    overflow: hidden;
+}
+
+/* ==================================================================== */
+@media screen and (max-width : 1023px){
+    
+}
