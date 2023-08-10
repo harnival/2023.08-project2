@@ -18,6 +18,22 @@
 .h_new form {
     width: 100%;
 }
+.h_new_group {
+    position: relative;
+    display: flex;
+}
+.h_new_group ul {
+    border: 2px solid black;
+    left: 100%;
+    top: 0;
+    width: 100%;
+    display: flex;
+    gap: 1rem;
+}
+.h_new_group li {
+    background-color: black;
+    color: white;
+}
 .h_new textarea{
     resize: none;
     width: 100%;

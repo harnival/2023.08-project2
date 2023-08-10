@@ -1,8 +1,9 @@
-import { getDoc, onSnapshot, doc, query, collection, orderBy, getDocs, where, addDoc, updateDoc, arrayUnion } from 'firebase/firestore';
+import { getDoc, onSnapshot, doc, query, collection, orderBy, getDocs, where, addDoc, updateDoc, arrayUnion, Timestamp } from 'firebase/firestore';
 import '../css/account.css'
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { useEffect, useState, useRef, useCallback, memo } from 'react';
 import { useAuth, useFirestore } from '../datasource/firebase';
 import { useParams, useNavigate } from 'react-router-dom';
+import store from '../store/store';
 
 export default function Account(props){
 
@@ -18,8 +19,7 @@ export default function Account(props){
     const [openUserMenu, setopenUserMenu] = useState(false) // 유저 메뉴 온오프
     const [existID, setexistID] = useState(false)
 
-    useEffect(function(){
-         // 게시물 미디어 슬라이드 //
+    useEffect(function(){   // 게시물 미디어 슬라이드 //
          if(callPost){
             const lists = document.querySelectorAll(".acc_f_c_image");
                 lists.forEach((v,i) => {
@@ -43,6 +43,7 @@ export default function Account(props){
                 })
          }
     },[callPost])
+
     useEffect(function(){   // 유저 메뉴 온오프 //
         if(openUserMenu){
             const btn = [...document.querySelectorAll(".acc_i_a_b_menu a")];
@@ -76,12 +77,26 @@ export default function Account(props){
         })
     },[userID])
 
-    const setPost = async function(){   // 피드 로드
+    const changeTime = function(timestamp){
+        const time = timestamp * 1000;
+        const timeObj = {
+            year : new Date(time).getFullYear(),
+            month : new Date(time).getMonth() +1,
+            date : new Date(time).getDate(),
+            hour : new Date(time).getHours() <10? "0"+new Date(time).getHours() : new Date(time).getHours(),
+            minute : new Date(time).getMinutes() <10? "0"+new Date(time).getMinutes() : new Date(time).getMinutes(),
+        }
+        return `${timeObj.year}년 ${timeObj.month}월 ${timeObj.date}일 ${timeObj.hour}시 ${timeObj.minute}분`
+    }
+
+    useEffect(function(){   // 게시물 로드
         const q = query(collection(useFirestore,'posts'),where('uid','==',userID));
         const data1 = onSnapshot(q, async(snapshotDoc) => {
             const dataArr = await Promise.all(
                 snapshotDoc.docs.map(async(v) => {
-                    const time = v.data().time.seconds * 1000;
+                    const postData = v.data();
+
+                    const time = postData.time * 1000;
                     const timeObj = {
                         year : new Date(time).getFullYear(),
                         month : new Date(time).getMonth() +1,
@@ -89,11 +104,10 @@ export default function Account(props){
                         hour : new Date(time).getHours() <10? "0"+new Date(time).getHours() : new Date(time).getHours(),
                         minute : new Date(time).getMinutes() <10? "0"+new Date(time).getMinutes() : new Date(time).getMinutes(),
                     }
-                    const data1 = await getDoc(doc(useFirestore,'account',v.data().uid))
-                    const data2 = data1.data()
                     
-                    const comments = v.data().comment.map(v => v.uid);
-                    if(!!comments.length){
+                    let commentUserArr = [];
+                    if(postData.comment.length !== 0){
+                        const comments = postData.comment.map(v => v.uid);
                         const commentUser = [...new Set(comments)]
                         const userData1 = await Promise.all(
                             commentUser.map(async(v) => {
@@ -107,23 +121,18 @@ export default function Account(props){
                                 })
                             })
                         )
-                        console.log(commentUser)
-                        return ({...v.data(), user_name : data2.general.name, user_id : data2.general.id , user_photo : data2.general.photoURL, time : timeObj, userInfo : userData1});
+                        commentUserArr = [...userData1];
                     }
-                    return ({...v.data(), user_name : data2.general.name, user_id : data2.general.id , user_photo : data2.general.photoURL, time : timeObj});
+                    const dataObj = {...postData, user_name : userInfo.name, user_id : userInfo.id , user_photo : userInfo.photoURL, time : timeObj, userInfo : commentUserArr, postID : v.id};
+                    return ([v.id, dataObj]);
     
                 })
             )
-            const dataArr2 = [...dataArr].sort((a,b) => a.time.seconds - b.time.seconds)
-            setcallPost(state => dataArr2)
+            const dataArr2 = [...dataArr].sort((a,b) => a[1].time.seconds - b[1].time.seconds).reverse()
+            setcallPost(state => [...dataArr2])
         })
-    }
-    useEffect(function(){
-        setPost()
-    },[userID])
-    useEffect(function(){
-        return () => setPost()
-    },[])
+        return () => data1()
+    },[userInfo])
 
     const sendMessage = function(){
         if(userID !== useAuth.currentUser.uid){
@@ -155,6 +164,104 @@ export default function Account(props){
         }
     }
 
+    const PostComponent = memo(function({data, idx}){
+        const postID = data[0];
+        const v = data[1]
+        const i = idx;
+
+        return(
+            <li className='acc_f_list' >
+                <div className="acc_f_content">
+                    <div className="acc_f_c_account">
+                            <div className="acc_f_c_acc_avatar">
+                                <img src={v['user_photo']}/>
+                            </div>
+                            <div className="acc_f_c_acc_name">
+                                <strong>{v['user_name']}</strong><br />
+                                <span>@{v['user_id']}</span>
+                            </div>
+                        <div className="acc_f_c_acc_sub">
+                            <span>{`${v.time.year}년 ${v.time.month}월 ${v.time.date}일 ${v.time.hour}시 ${v.time.minute}분`}</span>
+                            <div>
+                                <button type='button'>옵션</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="acc_f_c_text">{v.text}</div>
+                    {!!v.media.length? (
+                        <div className="acc_f_c_image">
+                            <div className="acc_f_c_image_slide">
+                                {v.media.map((v,i) => ( 
+                                    <div key={i} className="acc_f_c_image_unit">
+                                        <img src={v}/> 
+                                    </div>))}
+                            </div>
+                            <button type='button' className="acc_f_c_image_left">왼쪽으로 이동</button>
+                            <button type='button' className="acc_f_c_image_right">오른쪽으로 이동</button>
+
+                        </div>
+                    ): null}
+                </div>
+                <div className="acc_f_comment">
+                    <div className="acc_f_com_like">
+                        <div>
+                            <button type='button'>likes</button>
+                            <span>{v.like}</span>
+                        </div>
+                        <div>
+                            <button type='button'>send</button>
+                        </div>
+                    </div>
+                    <ul>
+                        {v.comment && v.comment.length !== 0? (
+                            v.comment.map((val,idx) => (
+                                <li className="acc_f_com_unit" key={"comment_"+idx}>
+                                    <div className="acc_f_com_u_account">
+                                        <div className="acc_f_com_u_avatar">
+                                            <img src={v.userInfo.find(v => v.uid === val.uid).photoURL} />
+                                        </div>
+                                        <div className="acc_f_com_u_name">@{v.userInfo.find(v => v.uid === val.uid).id}</div>
+                                        <div className="acc_f_com_u_time">{changeTime(val.time.seconds)}</div>
+                                    </div>
+                                    <div className="acc_f_com_u_text">{val.text}</div>
+                                </li>
+                            ))
+                        ) : (
+                            <li>댓글이 없습니다.</li>
+                        )}
+                        <li className="acc_f_com_input">
+                            <form onSubmit={(e)=> setComment(e, postID)}>
+                                <input type="text" name='text'/>
+                                <button>submit</button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+        )
+    })
+
+    let commentUnit = useRef()
+    const setComment = function(event, postID){
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        const data = Object.fromEntries(formData.entries());
+        console.log(data)
+        const posting = {
+            uid : useAuth.currentUser.uid,
+            text : data.text,
+            time : Timestamp.now().seconds
+        }
+        const db = doc(useFirestore,'posts',postID);
+        updateDoc(db,{
+            comment : arrayUnion(posting)
+        })
+        return () => {
+            commentUnit.current.value = ''
+        }
+    }
+
+    //  return ================================================================ //
     return(
         <div id="account">
             <div className="accountBox">
@@ -193,79 +300,15 @@ export default function Account(props){
                     </div>
                 </div>
                 <div className="acc_feed">
-                    <ul>
-                        {callPost.map((v,i) =>{return(
-                            <li className='acc_f_list' key={v['uid'] + "_" + i}>
-                                <div className="acc_f_content">
-                                    <div className="acc_f_c_account">
-                                            <div className="acc_f_c_acc_avatar">
-                                                <img src={v['user_photo']}/>
-                                            </div>
-                                            <div className="acc_f_c_acc_name">
-                                                <strong>{v['user_name']}</strong><br />
-                                                <span>@{v['user_id']}</span>
-                                            </div>
-                                        <div className="acc_f_c_acc_sub">
-                                            <span>{`${v.time.year}년 ${v.time.month}월 ${v.time.date}일 ${v.time.hour}시 ${v.time.minute}분`}</span>
-                                            <div>
-                                                <button type='button'>옵션</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="acc_f_c_text">{v.text}</div>
-                                    {!!v.media.length? (
-                                        <div className="acc_f_c_image">
-                                            <div className="acc_f_c_image_slide">
-                                                {v.media.map((v,i) => ( 
-                                                    <div key={i} className="acc_f_c_image_unit">
-                                                        <img src={v}/> 
-                                                    </div>))}
-                                            </div>
-                                            <button type='button' className="acc_f_c_image_left">왼쪽으로 이동</button>
-                                            <button type='button' className="acc_f_c_image_right">오른쪽으로 이동</button>
-
-                                        </div>
-                                    ): null}
-                                </div>
-                                <div className="acc_f_comment">
-                                    <div className="acc_f_com_like">
-                                        <div>
-                                            <button type='button'>likes</button>
-                                            <span>{v.like}</span>
-                                        </div>
-                                        <div>
-                                            <button type='button'>send</button>
-                                        </div>
-                                    </div>
-                                    <ul>
-                                        {v.comment && v.comment.length !== 0? (
-                                            v.comment.map((val,idx) => (
-                                                <li className="acc_f_com_unit" key={"comment_"+i}>
-                                                    <div className="acc_f_com_u_account">
-                                                        <div className="acc_f_com_u_avatar">
-                                                            <img src={v.userInfo.find(v => v.uid === val.uid).photoURL} />
-                                                        </div>
-                                                        <div className="acc_f_com_u_name">@{v.userInfo.find(v => v.uid === val.uid).id}</div>
-                                                        <div className="acc_f_com_u_time">{v.time.seconds}</div>
-                                                    </div>
-                                                    <div className="acc_f_com_u_text">{v.text}</div>
-                                                </li>
-                                            ))
-                                        ) : (
-                                            <li>댓글이 없습니다.</li>
-                                        )}
-                                        <li className="acc_f_com_input">
-                                            <div >
-                                                <input type="text" />
-                                                <button>submit</button>
-                                            </div>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </li>
-                        )}
-                        )}
-                    </ul>
+                    {store.getState().setCurrentUser.block.some(v => v === userID) ? (
+                        <div>
+                            <p><strong>차단한 유저입니다.</strong></p>
+                        </div>
+                    ):(
+                        <ul>
+                            {callPost.map((v,i) => (<PostComponent data={v} idx={i} key={v['uid'] + "_" + i}/>))}
+                        </ul>
+                    )}
                 </div>
             </div>
         </div>

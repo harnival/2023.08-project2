@@ -73,11 +73,9 @@ const registUser = function(info){
     setDoc(doc(useFirestore,'account', user.uid),{
       general : generals,
       group : [],
-      message : [],
-      post : [],
-      comment : [],
       follower : [],
-      like : []
+      like : [],
+      block : []
     })
   })
   .catch(err => {
