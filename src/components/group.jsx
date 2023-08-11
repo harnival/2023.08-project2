@@ -14,11 +14,7 @@ export default function Group(){
     const [limitDesc, setlimitDesc] = useState()
 
     useEffect(function(){   //그룹 게시물 변화 감시
-        const checkChange = async function(){
-            const w = Object.keys(store.getState().setCurrentUser.group);
-            
-        }
-        checkChange()
+       
     },[])
 
     useEffect(function(){ //초기 그룹 입력
@@ -34,6 +30,7 @@ export default function Group(){
         callFirst()
     },[])
 
+    // 그룹 생성 //
     const [selectAvatar, setselectAvatar] = useState()
     let imageFileReader = useRef();
     const selectImage = function(e){
@@ -64,11 +61,25 @@ export default function Group(){
         const userDB = doc(useFirestore,'account',useAuth.currentUser.uid);
         const adddocs = await addDoc(groupDB,groupAdd);
         await updateDoc(userDB,{
-            group : arrayUnion(adddocs.id)
+            group : {[adddocs.id] : groupAdd.title}
         })
         return navigate(`/group/${adddocs.id}`)
     }
-
+    const gNew = useRef();
+    const gNewChild = useRef({
+        input : null,
+        textarea: null
+    })
+    const toggleNew = function(){
+        gNew.current.classList.toggle('g_new_toggle')
+        if(gNew.current.classList.contains("g_new_toggle")){
+            if(gNewChild.current.input){
+                gNewChild.current.input.value = ''
+                gNewChild.current.textarea.value = ''
+                setselectAvatar(state => '')
+            }
+        }
+    }
 
     function GroupMain(){
         return(
@@ -80,7 +91,7 @@ export default function Group(){
                         <li className='g_b_my_list' key={`group_${v.id}`}>
                             <div className="g_b_my_img">
                                 <div className="g_b_img_wrap">
-                                    <Link to={`${v.id}`} state={{title : v.title}}>
+                                    <Link to={`${v.id}`} state={{title : v.title, desc : v.description, photoURL : v.photoURL, user : [...v.user]}}>
                                         <img src={v.photoURL? v.photoURL : null}/>
                                     </Link>
                                 </div>
@@ -130,22 +141,33 @@ export default function Group(){
                         <button>검색</button>
                     </div>
                     <div className="g_s_btn g_s_btn2">
-                        <button>그룹 생성</button>
+                        <button onClick={() => toggleNew()}>그룹 생성</button>
                     </div>
                 </div>
-                <div className="g_new">
+                <div className="g_new g_new_toggle" ref={gNew}>
                     <form className="g_new_box" onSubmit={(e) => makeGroup(e)}>
                         <div className="g_new_image" onClick={(e) => clickToImage(e)}>
                                 <img src={selectAvatar} />
                                 <input ref={input => imageFileReader = input} type="file" id="g_new_image_file" accept='image/*' onChange={(e) => selectImage(e)} hidden={true}/>
+                                {!selectAvatar && (
+                                    <div className="g_new_i_cover">
+                                        <p className="cover_bg"></p>
+                                        <p>* 이미지 파일( .jpg, .png, .webp, .svg 등) 만 사용 가능합니다.</p>
+                                        <p>* 이미지는 전체 사이즈가 적용됩니다.</p>
+                                        <p style={{color : 'red'}}>* 추가를 위해 클릭해주세요.</p>
+                                    </div>
+                                )}
                         </div>
                         <div className="g_new_text">
                             <div className="g_new_t_title">
-                                <input type="text" name="title" id="" placeholder='# 그룹 타이틀' />
+                                <input ref={input => gNewChild.current.input = input} type="text" name="title" id="" placeholder='# 그룹 타이틀' />
                             </div>
                             <div className="g_new_t_desc">
-                                <textarea name="desc" maxLength={100} placeholder='그룹 설명 (100자 이내)'></textarea>
+                                <textarea ref={input => gNewChild.current.textarea = input} name="desc" maxLength={100} placeholder='그룹 설명 (100자 이내)'></textarea>
                                 <span></span>
+                            </div>
+                            <div className="g_new_btn">
+                                <button>생성하기</button>
                             </div>
                         </div>
                     </form>

@@ -6,7 +6,7 @@ import {Routes, Route, Link, redirect, useNavigate} from 'react-router-dom'
 
 import {useAuth, useFirestore, userLogout} from './datasource/firebase';
 import { onAuthStateChanged } from 'firebase/auth'
-import {  doc, getDoc } from 'firebase/firestore';
+import {  doc, getDoc, onSnapshot } from 'firebase/firestore';
 import store from './store/store';
 
 import './css/app.css';
@@ -21,12 +21,13 @@ export default function App(){
     onAuthStateChanged(useAuth,(user) => {
       if(user){
         const userDb = doc(useFirestore, 'account', user.uid);
-        getDoc(userDb).then(snapshot => {
+        const unsub = onSnapshot(userDb, (snapshot) => {
           const data = snapshot.data();
           store.dispatch({type : 'setCurrentUser_Login' , info : data})
           console.log("[currentUser]",useAuth.currentUser)
           navigate('/')
         })
+        return () => unsub()
       } else {
         store.dispatch({type : 'setCurrentUser_Logout'})
         console.log("[currentUser] logout")

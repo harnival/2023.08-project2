@@ -5,6 +5,8 @@ import { useAuth, useFirestore } from '../datasource/firebase';
 import { useParams, useNavigate } from 'react-router-dom';
 import store from '../store/store';
 
+import PostComponent from './post';
+
 export default function Account(props){
 
     const navigate = useNavigate();
@@ -15,9 +17,10 @@ export default function Account(props){
         id : null,
         uid : userID,
     })
-    const [callPost, setcallPost] = useState([])    // 게시물 불러오기
     const [openUserMenu, setopenUserMenu] = useState(false) // 유저 메뉴 온오프
-    const [existID, setexistID] = useState(false)
+    const [userPage, setuserPage] = useState(0)     // 유저 페이지 - 0 : 피드 , 1 : 그룹 , 2 : 좋아요
+    const [callPost, setcallPost] = useState([])    // 게시물 불러오기
+    const [groupList, setgroupList] = useState([])  // 그룹 리스트 불러오기
 
     useEffect(function(){   // 게시물 미디어 슬라이드 //
          if(callPost){
@@ -69,7 +72,9 @@ export default function Account(props){
                     name : data.general.name,
                     photoURL : data.general.photoURL? data.general.photoURL : null,
                     id : data.general.id,
-                    uid : userID,        
+                    uid : userID,
+                    group : data.group,
+                    like : data.like    
                 }))
             } else {
                 console.log("ddddddd")
@@ -95,7 +100,7 @@ export default function Account(props){
             const dataArr = await Promise.all(
                 snapshotDoc.docs.map(async(v) => {
                     const postData = v.data();
-
+                    // 시간 변환
                     const time = postData.time * 1000;
                     const timeObj = {
                         year : new Date(time).getFullYear(),
@@ -104,7 +109,7 @@ export default function Account(props){
                         hour : new Date(time).getHours() <10? "0"+new Date(time).getHours() : new Date(time).getHours(),
                         minute : new Date(time).getMinutes() <10? "0"+new Date(time).getMinutes() : new Date(time).getMinutes(),
                     }
-                    
+                    // 댓글 목록
                     let commentUserArr = [];
                     if(postData.comment.length !== 0){
                         const comments = postData.comment.map(v => v.uid);
@@ -123,17 +128,55 @@ export default function Account(props){
                         )
                         commentUserArr = [...userData1];
                     }
-                    const dataObj = {...postData, user_name : userInfo.name, user_id : userInfo.id , user_photo : userInfo.photoURL, time : timeObj, userInfo : commentUserArr, postID : v.id};
+                    // 게시글 그룹 정보
+                    let groupObj = {}
+                    const group = postData.group;
+                    if(group){
+                        const groupInfo = await getDoc(doc(useFirestore,'groups',group))
+                        const groupData = groupInfo.data()
+                            groupObj.title = groupData.title;
+                            groupObj.photoURL = groupData.photoURL;
+                            groupObj.id = group
+                    }
+                    // 이미지 배열 정리
+                    const mediaArr = Object.entries({...postData}).filter(v => v[0].split('_')[0] === 'media')
+                    const mediaArr2 = mediaArr.map(v => v[1]);
+
+
+                    const dataObj = {...postData,
+                        media : [...mediaArr2],
+                        user_name : userInfo.name, 
+                        user_id : userInfo.id , 
+                        user_photo : userInfo.photoURL, 
+                        time : timeObj, 
+                        userInfo : commentUserArr, 
+                        postID : v.id,
+                        group : {...groupObj}
+                    };
                     return ([v.id, dataObj]);
     
                 })
             )
-            const dataArr2 = [...dataArr].sort((a,b) => a[1].time.seconds - b[1].time.seconds).reverse()
+            const dataArr2 = [...dataArr].sort((a,b) => a[1].time - b[1].time)
             setcallPost(state => [...dataArr2])
         })
         return () => data1()
     },[userInfo])
 
+    useEffect(function(){   // 그룹 정보 로드
+        async function groupLoad(){
+            const group = userInfo.group;
+            const maps = await Promise.all(group.map(async(v) => {
+                const groupDB = doc(useFirestore,'groups',v);
+                const groupData = await getDoc(groupDB);
+                const groupData2 = groupData.data();
+                const groupData3 = [v , {...groupData2}];
+                return groupData3
+            }))
+            setgroupList(state => [...maps])
+        }
+        groupLoad()
+    },[userInfo])
     const sendMessage = function(){
         if(userID !== useAuth.currentUser.uid){
             const q = query(collection(useFirestore,'messages'),where('user','in', [[userID, useAuth.currentUser.uid],[useAuth.currentUser.uid, userID]]));
@@ -163,7 +206,27 @@ export default function Account(props){
             })
         }
     }
+    let commentUnit = useRef()
+    const setComment = function(event, postID){     // 댓글 입력
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        const data = Object.fromEntries(formData.entries());
+        console.log(data)
+        const posting = {
+            uid : useAuth.currentUser.uid,
+            text : data.text,
+            time : Timestamp.now().seconds
+        }
+        const db = doc(useFirestore,'posts',postID);
+        updateDoc(db,{
+            comment : arrayUnion(posting)
+        })
+        return () => {
+            commentUnit.current.value = ''
+        }
+    }
 
+//  components ============================================================== //
     const PostComponent = memo(function({data, idx}){
         const postID = data[0];
         const v = data[1]
@@ -240,28 +303,18 @@ export default function Account(props){
             </li>
         )
     })
+    const GroupComponent = memo(function({data}){
+        return(
+            <li>
 
-    let commentUnit = useRef()
-    const setComment = function(event, postID){
-        event.preventDefault();
-        const formData = new FormData(event.target);
-        const data = Object.fromEntries(formData.entries());
-        console.log(data)
-        const posting = {
-            uid : useAuth.currentUser.uid,
-            text : data.text,
-            time : Timestamp.now().seconds
-        }
-        const db = doc(useFirestore,'posts',postID);
-        updateDoc(db,{
-            comment : arrayUnion(posting)
-        })
-        return () => {
-            commentUnit.current.value = ''
-        }
-    }
+            </li>
+        )
+    })
 
-    //  return ================================================================ //
+
+    
+
+//  return ================================================================ //
     return(
         <div id="account">
             <div className="accountBox">
@@ -297,6 +350,13 @@ export default function Account(props){
                                 <a href="/#">cancel follow</a>
                             </div>
                         ) : null }
+                        <div className="acc_i_pageMenu">
+                            <ul>
+                                <li><button type='button' onClick={() => setuserPage(state => 0)}>feed</button></li>
+                                <li><button type='button' onClick={() => setuserPage(state => 1)}>group</button></li>
+                                <li><button type='button' onClick={() => setuserPage(state => 2)}>like</button></li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
                 <div className="acc_feed">
@@ -304,11 +364,24 @@ export default function Account(props){
                         <div>
                             <p><strong>차단한 유저입니다.</strong></p>
                         </div>
-                    ):(
+                    ): userPage === 0 ? (
                         <ul>
-                            {callPost.map((v,i) => (<PostComponent data={v} idx={i} key={v['uid'] + "_" + i}/>))}
+                            {callPost.map((v,i) => (
+                                <PostComponent data={v} idx={i} key={v['uid'] + "_" + i}/>
+                            ))}
                         </ul>
-                    )}
+                    ) : userPage === 1 ? (
+                        <div className='acc_group'>
+                            <ul>
+
+                            </ul>
+                        </div>
+                    ) : userPage === 2 ? (
+                        <div className='acc_like'>
+
+                        </div>
+                    ) : null
+                    }
                 </div>
             </div>
         </div>

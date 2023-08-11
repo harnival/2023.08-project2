@@ -4,6 +4,9 @@ import store from '../store/store';
 import {useEffect, useMemo, useRef, useState, memo} from 'react';
 import { useAuth, useFirestore } from '../datasource/firebase';
 import { useNavigate } from 'react-router-dom';
+
+import PostComponent from './post';
+
 export default function Home(){
     const navigate = useNavigate();
 
@@ -16,6 +19,8 @@ export default function Home(){
 
     const [postIds, setpostIds] = useState([]);
     const [postFeed, setpostFeed] = useState({});
+    const [selectImage, setselectImage] = useState([]);
+
 
     useEffect(function(){   // 게시물 데이터베이스에 호출
         const myGroup = Object.keys(store.getState().setCurrentUser.group)
@@ -50,9 +55,10 @@ export default function Home(){
                     const myBlock = store.getState().setCurrentUser.block;
     
                     if(!myBlock.some(v => v === postData.uid)){
+                        // 작성자 정보
                         const userDb = await getDoc(doc(useFirestore,'account',postData.uid))
                         const data2 = userDb.data();
-        
+                        // 시간 변환
                         const time = postData.time * 1000;
                         const timeObj = {
                             year : new Date(time).getFullYear(),
@@ -61,7 +67,7 @@ export default function Home(){
                             hour : new Date(time).getHours() <10? "0"+new Date(time).getHours() : new Date(time).getHours(),
                             minute : new Date(time).getMinutes() <10? "0"+new Date(time).getMinutes() : new Date(time).getMinutes(),
                         }
-        
+                        // 댓글 정보
                         let commentUserArr = [];
                         if(postData.comment.length !== 0){
                             const comments = postData.comment.map(v => v.uid);
@@ -80,7 +86,30 @@ export default function Home(){
                             )
                             commentUserArr = [...userData1];
                         }
-                        const dataObj = {...postData, user_name : data2.general.name, user_id : data2.general.id , user_photo : data2.general.photoURL, time : timeObj, userInfo : commentUserArr, postID : postDoc.id};
+                        // 게시글 그룹 정보
+                        let groupObj = {}
+                        const group = postData.group;
+                        if(group){
+                            const groupInfo = await getDoc(doc(useFirestore,'groups',group))
+                            const groupData = groupInfo.data()
+                                groupObj.title = groupData.title;
+                                groupObj.photoURL = groupData.photoURL;
+                                groupObj.id = group
+                        }
+                        // 이미지 배열 정리
+                        const mediaArr = Object.entries({...postData}).filter(v => v[0].split('_')[0] === 'media')
+                        const mediaArr2 = mediaArr.map(v => v[1]);
+
+                        const dataObj = {...postData,
+                            media : [...mediaArr2],
+                            user_name : data2.general.name, 
+                            user_id : data2.general.id , 
+                            user_photo : data2.general.photoURL, 
+                            time : timeObj, 
+                            userInfo : commentUserArr, 
+                            postID : postDoc.id,
+                            group : {...groupObj}
+                        };
                         setpostFeed(state => ({...state, [postDoc.id] : dataObj}))
                         setfeedLoading(false)
                     }
@@ -91,29 +120,29 @@ export default function Home(){
 
     },[postIds])
 
-    useEffect(function(){   // 게시물 이미지 슬라이드 //
-        console.log("[postFeed changed]",postFeed)
-        const lists = document.querySelectorAll(".h_f_list");
-        lists.forEach((v,i) => {
-            let n=0;
-            v.querySelector(".h_f_c_image_right").addEventListener('click',function(){
-                const slide = v.querySelector(".h_f_c_image_slide");
-                const len = v.querySelectorAll(".h_f_c_image_unit").length
-                if(n < len-1){
-                    n++;
-                    slide.style.transform = `translateX(-${n * slide.offsetWidth / len}px)`
-                }
-            })
-            v.querySelector(".h_f_c_image_left").addEventListener('click',function(){
-                const slide = v.querySelector(".h_f_c_image_slide");
-                const len = v.querySelectorAll(".h_f_c_image_unit").length
-                if(n > 0){
-                    n--;
-                    slide.style.transform = `translateX(-${n * slide.offsetWidth / len}px)`
-                }
-            })
-        })
-    },[postFeed])
+    // useEffect(function(){   // 게시물 이미지 슬라이드 //
+    //     console.log("[postFeed changed]",postFeed)
+    //     const lists = document.querySelectorAll(".h_f_list");
+    //     lists.forEach((v,i) => {
+    //         let n=0;
+    //         v.querySelector(".h_f_c_image_right").addEventListener('click',function(){
+    //             const slide = v.querySelector(".h_f_c_image_slide");
+    //             const len = v.querySelectorAll(".h_f_c_image_unit").length
+    //             if(n < len-1){
+    //                 n++;
+    //                 slide.style.transform = `translateX(-${n * slide.offsetWidth / len}px)`
+    //             }
+    //         })
+    //         v.querySelector(".h_f_c_image_left").addEventListener('click',function(){
+    //             const slide = v.querySelector(".h_f_c_image_slide");
+    //             const len = v.querySelectorAll(".h_f_c_image_unit").length
+    //             if(n > 0){
+    //                 n--;
+    //                 slide.style.transform = `translateX(-${n * slide.offsetWidth / len}px)`
+    //             }
+    //         })
+    //     })
+    // },[postFeed])
 
 // function ============================================================= //
     const setPost = async function(e){  // 게시물 등록 //
@@ -125,18 +154,23 @@ export default function Home(){
             comment : [],
             group : data.group,
             like: [],
-            media: selectImage,
             text: data.text,
             time : Timestamp.now().seconds,
             uid : useAuth.currentUser.uid
         }
-        addDoc(collection(useFirestore,'posts'),posting)
-        .then(() => {
+        await Promise.all(
+            selectImage.map((v,i) => {
+                posting[`media_${i}`] = v
+            })
+        )
+        await addDoc(collection(useFirestore,'posts'),posting)
+        
+        return () => {
             showGroup.current.value = ''
             selectGroup.current.value = ''
             textArea.current.value = ''
             setselectImage(state => [])
-        })
+        }   
         
     }
 
@@ -159,17 +193,24 @@ export default function Home(){
     }
 
     // 이미지 업로드 //
-    const [selectImage, setselectImage] = useState([]);
     const postImage = async function(event){
         if(selectImage.length <5){
-            const loader = event.target.files[0];
-            if(loader){
-                const reader = new FileReader();
-                reader.readAsDataURL(loader);
-                reader.onload = function(val){
-                    setselectImage(state => ([...state, val.target.result]))
+                const loader = event.target.files[0];
+                const size = loader.size;
+                const limit = 1048487;
+                if(loader){
+                    if( size < limit){
+                        const reader = new FileReader();
+                        reader.readAsDataURL(loader);
+                        reader.onload = function(val){
+                            setselectImage(state => ([...state, val.target.result]))
+                        }
+                    } else {
+                        event.target.value = '';
+                        alert(" 1MB 이하 이미지 파일만 등록이 가능합니다.")
+                        return false;
+                    }
                 }
-            }
         }
     }
     let fileInput = useRef()
@@ -219,7 +260,7 @@ export default function Home(){
         })
     }
 // components ================================================= //
-    const PostComponent = memo(({v}) => {
+    const PostComponent1 = memo(({v}) => {
         const postID = v[0];
         const postData = v[1]
         return(
@@ -307,6 +348,8 @@ export default function Home(){
         )
     }
     )
+
+    const HomeUnitPostComponent = memo(({v}) => PostComponent({v}))
 
     const DetailComponent = function({postID}){
         return(
@@ -415,8 +458,9 @@ export default function Home(){
                             {!Object.entries(postFeed).length? (
                                 <div>텅텅.....</div>
                             ) : (
-                                Object.entries(postFeed).sort((a,b) => a[1].time.seconds - b[1].time.seconds).reverse().map((v,i) => (   
-                                <PostComponent v={v} key={v[0]}/>
+                                Object.entries(postFeed).sort((a,b) => a[1].time - b[1].time).map((v,i) => (   
+                                // <PostComponent v={v} key={v[0]}/>
+                                < HomeUnitPostComponent v={v} key={v[0]}/>
                                 ))
                             )}
                         </ul>

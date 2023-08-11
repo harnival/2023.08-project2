@@ -1,0 +1,229 @@
+.h_f_list{
+    width: 80%;
+    margin: auto;
+    background-color: white;
+    display: flex;
+    margin-bottom: 2rem;
+    min-height: 30vh;
+}
+.h_f_content {
+    width: 65%;
+    height: 100%;
+}
+.h_f_c_group {
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.h_f_c_g_image {
+    height: 90%;
+    aspect-ratio: 1/1;
+    border: 1px solid black;
+    border-radius: 20%;
+    background-color: white;
+    overflow: hidden;
+}
+.h_f_c_g_image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+.h_f_c_account {
+    height: max(3rem, 8vh);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    position: relative;
+    padding: 0.5rem;
+    box-sizing: border-box;
+}
+
+.h_f_c_acc_avatar {
+    height: 90%;
+    aspect-ratio: 1/1;
+    border: 1px solid #666;
+    border-radius: 20%;
+    overflow: hidden;
+    cursor: pointer;
+}
+.h_f_c_acc_name {
+    cursor: pointer;
+}
+.h_f_c_acc_avatar img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+.h_f_c_acc_name span{
+    font-size: 80%;
+    color: #444;
+}
+.h_f_c_acc_sub {
+    position: absolute;
+    right: 0;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+.h_f_c_acc_sub > span {
+    font-size: 80%;
+    color: #444;
+}
+.h_f_c_acc_sub_options {
+    background-color: white;
+    box-shadow: 1px 2px 5px 0px rgb(0,0,0,0.5);
+    position: absolute;
+    top: 100%;
+    right: 0;
+}
+.h_f_c_acc_sub_options button{
+    text-align: center;
+    min-width: 5rem;
+    display: block;
+    padding: 0.5rem;
+    border: 0;
+    cursor: pointer;
+}
+
+.h_f_c_acc_optionBtn{
+    width: 2rem;
+    height: 2rem;
+    font-size: 0;
+    background: url('../img/dots-vertical.svg') no-repeat center / 80%;
+    cursor: pointer;
+    border: 0;
+}
+.h_f_c_text {
+    min-height: 1rem;
+    width: 90%;
+    margin: auto;
+    padding: 0.5rem 0;
+}
+.h_f_c_image {
+    height: 50vh;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.h_f_c_image_left ,
+.h_f_c_image_right {
+    position: absolute;
+    border: 0;
+    width: 3rem;
+    aspect-ratio: 1/1;
+    font-size: 0px;
+    cursor: pointer;
+}
+.h_f_c_image_left {
+    left: 0;
+    background: white;
+}
+.h_f_c_image_right {
+    right: 0;
+    background: white;
+} 
+.h_f_c_image_slide{
+    display: flex;
+    transition: .3s ease;
+    position: relative;
+}
+.h_f_c_image_unit {
+    height: 50vh;
+    width: calc( 100vw * 0.8 * 0.65);
+    max-width: calc( 1280px * 0.8 * 0.65 );
+    min-width: 50vh;
+    background-color: black;
+    border: 1px solid blue;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.h_f_c_image_unit img{
+    height: 100%;
+    background-color: white;
+}
+
+.h_f_comment {
+    width: 35%;
+    height: 100%;
+}
+
+.h_f_com_like {
+    background-color: #666;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1rem;
+}
+.h_f_com_like_like {
+    border: 0;
+    width: 1.5rem;
+    height: 1.5rem;
+    font-size: 0;
+    background: url('../img/heart-outline.svg') no-repeat center / contain;
+    cursor: pointer;
+}
+.h_f_com_like_like.likeChecked {
+    background: url('../img/heart.svg') no-repeat center / contain;
+}
+.h_f_com_unit {
+    border-bottom: 1px solid #eee;
+    width: 100%;
+}
+.h_f_com_u_account {
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+.h_f_com_u_avatar {
+    height: 90%;
+    aspect-ratio: 1/1;
+    border: 1px solid #666;
+    border-radius: 20%;
+    overflow: hidden;
+    background-color: white;
+}
+.h_f_com_u_avatar img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+.h_f_com_u_time {
+    font-size: 80%;
+    color: #444;
+    position: absolute;
+    right: 0;
+}
+.h_f_com_u_text{
+    width: 90%;
+    margin: auto;
+    padding: 0.5rem 0;
+}
+.h_f_com_lists {
+    height: 100%;
+    position: relative;
+    flex: 1;
+    overflow: auto;
+    display: flex;
+    flex-direction: column-reverse;
+}
+.h_f_com_lists ul {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+}
+.h_f_com_input {
+    height: 3rem;
+    background-color: tomato;
+    width: 100%;
+}
+

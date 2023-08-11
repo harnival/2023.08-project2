@@ -175,10 +175,20 @@ export default function Signin(){
         const [avatar, setavatar] = useState();
         const imageInput = async function(event){
             const loader = event.target.files[0];
-            const reader = new FileReader();
-            reader.readAsDataURL(loader);
-            reader.onload = function(val){
-                setavatar(state => val.target.result)
+            const size = loader.size;
+            const limit = 1048487;
+            if(loader){
+                if(size < limit) {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(loader);
+                    reader.onload = function(val){
+                        setavatar(state => val.target.result)
+                    }
+                } else {
+                    event.target.value = '';
+                    alert(" 1MB 이하 이미지 파일만 등록이 가능합니다.")
+                    return false;
+                }
             }
         }
         let fileInput = useRef()

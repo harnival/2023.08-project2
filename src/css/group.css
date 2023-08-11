@@ -101,17 +101,25 @@
     width: 100%;
     height: 30vh;
     border-collapse: collapse;
+    overflow: hidden;
+    transition: .3s ease;
+}
+.g_new.g_new_toggle {
+    height: 0;
 }
 .g_new_box {
     width: 60%;
-    height: 100%;
+    height: 30vh;
     margin: auto;
     background-color: white;
     border: 1px solid black;
+    box-sizing: border-box;
     display: flex;
+    border-bottom-left-radius: 2rem;
+    border-bottom-right-radius: 2rem;
+    overflow: hidden;
 }
 .g_new_image{
-    background-color: #565;
     width: 40%;
     height: 100%;
     border-right: 1px solid black;
@@ -119,8 +127,27 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
 }
-
+.g_new_i_cover {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: white;
+    font-size: 70%;
+    color: rgb(0,0,0,0.7);
+    padding: 1rem;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
+}
+.g_new_i_cover .cover_bg {
+    height: 100%;
+    background: transparent url('../img/image-plus.svg') no-repeat center/20%;
+}
 .g_new_image img {
     width: 100%;
     height: 100%;
@@ -148,7 +175,7 @@
 }
 .g_new_t_desc {
     width: 100%;
-    height: 80%;
+    height: calc(80% - 2rem);
     position: relative;
 }
 .g_new_t_desc textarea {
@@ -159,5 +186,10 @@
     min-width: 100%;
     min-height: 100%;
     box-sizing: border-box;
-    border-bottom: 1px solid black;
+}
+.g_new_btn {
+    height: 2rem;
+    text-align: end;
+    padding: 0 2rem;
+    box-sizing: border-box;
 }
