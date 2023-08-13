@@ -94,6 +94,26 @@
     margin: auto;
     background-color: white;
 }
+.acc_f_c_group {
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.acc_f_c_g_image {
+    height: 90%;
+    aspect-ratio: 1/1;
+    border: 1px solid black;
+    border-radius: 20%;
+    background-color: white;
+    overflow: hidden;
+}
+.acc_f_c_g_image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
 .acc_f_c_account {
     height: max(3rem, 8vh);
     display: flex;
@@ -147,15 +167,24 @@
     aspect-ratio: 1/1;
     font-size: 0px;
     cursor: pointer;
+    display: block;
+    background-color: transparent;
 }
 .acc_f_c_image_left {
     left: 0;
-    background: white;
 }
 .acc_f_c_image_right {
     right: 0;
-    background: white;
 } 
+.acc_f_c_image_left img ,
+.acc_f_c_image_right img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+    background-color: transparent;
+    filter:invert(100%);
+}
 .acc_f_c_image_slide{
     display: flex;
     transition: .3s ease;

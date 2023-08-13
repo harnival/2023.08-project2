@@ -1,20 +1,29 @@
 .h_f_list{
     width: 80%;
     margin: auto;
-    background-color: white;
+    /* background-color: white; */
+    padding: 2rem 0;
+}
+.h_f_list_box{
+    width: 100%;
     display: flex;
-    margin-bottom: 2rem;
-    min-height: 30vh;
+    justify-content: space-between;
+    position: relative;
 }
 .h_f_content {
-    width: 65%;
-    height: 100%;
+    width: 64%;
+
 }
 .h_f_c_group {
+    width: fit-content;
     height: 2rem;
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    background-color: royalblue;
+    padding: 0.3rem 1rem;
+    border-radius: 1rem;
+    color: white;
 }
 .h_f_c_g_image {
     height: 90%;
@@ -43,10 +52,12 @@
 .h_f_c_acc_avatar {
     height: 90%;
     aspect-ratio: 1/1;
-    border: 1px solid #666;
+    border: 1px solid black;
     border-radius: 20%;
     overflow: hidden;
     cursor: pointer;
+    background-color: white;
+    box-shadow: 1px 0px 2px 0px rgb(0,0,0,0.4);
 }
 .h_f_c_acc_name {
     cursor: pointer;
@@ -104,8 +115,8 @@
     padding: 0.5rem 0;
 }
 .h_f_c_image {
-    height: 50vh;
     width: 100%;
+    aspect-ratio: 1.4/1;
     overflow: hidden;
     position: relative;
     display: flex;
@@ -119,27 +130,36 @@
     aspect-ratio: 1/1;
     font-size: 0px;
     cursor: pointer;
+    display: block;
+    background-color: transparent;
 }
 .h_f_c_image_left {
     left: 0;
-    background: white;
 }
 .h_f_c_image_right {
     right: 0;
-    background: white;
 } 
+.h_f_c_image_left img ,
+.h_f_c_image_right img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+    background-color: transparent;
+    filter:invert(100%);
+}
 .h_f_c_image_slide{
     display: flex;
+    height: 100%;
     transition: .3s ease;
     position: relative;
 }
 .h_f_c_image_unit {
-    height: 50vh;
-    width: calc( 100vw * 0.8 * 0.65);
-    max-width: calc( 1280px * 0.8 * 0.65 );
+    height: 100%;
+    width: calc( 100vw * 0.8 * 0.64);
+    max-width: calc( 1280px * 0.8 * 0.64 );
     min-width: 50vh;
     background-color: black;
-    border: 1px solid blue;
     box-sizing: border-box;
     display: flex;
     justify-content: center;
@@ -149,42 +169,81 @@
     height: 100%;
     background-color: white;
 }
-
 .h_f_comment {
-    width: 35%;
-    height: 100%;
-}
+    width: 34%;
+    display: flex;
+    align-items: end;
+    border-radius: 1.5rem;
+    overflow: hidden;
+    background-color: white;
 
+}
+.h_f_commentBox{
+    width: 100%;
+}
+.no_reply {
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    padding: 10% 0;
+    color: rgb(0,0,0,0.5);
+    font-size: 80%;
+    background-color: white;
+}
 .h_f_com_like {
-    background-color: #666;
+    background-color: #eee;
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 0.5rem 1rem;
+}
+.h_f_com_like_likeWrap {
+    display: flex;
+    gap: 0.5rem;
+}
+.h_f_com_like_likeWrap p{
+    font-size: 90%;
+    height: 100%;
+    height: 1.5rem;
 }
 .h_f_com_like_like {
     border: 0;
     width: 1.5rem;
     height: 1.5rem;
     font-size: 0;
-    background: url('../img/heart-outline.svg') no-repeat center / contain;
+    background: url('../img/heart-outline.svg') no-repeat center /contain;
     cursor: pointer;
 }
 .h_f_com_like_like.likeChecked {
     background: url('../img/heart.svg') no-repeat center / contain;
 }
+.h_f_com_like_sendWrap button {
+    cursor: pointer;
+    border: 0;
+    width: 1.5rem;
+    height: 1.5rem;
+    font-size: 0;
+    background: url('../img/send.svg') scroll no-repeat center / contain;
+    border-radius: 20%;
+}
+.h_f_com_like_sendWrap button:active {
+    background-color: #ccc;
+}
 .h_f_com_unit {
     border-bottom: 1px solid #eee;
     width: 100%;
+    padding: 0.5rem;
+    box-sizing: border-box;
 }
 .h_f_com_u_account {
     height: 3rem;
     display: flex;
     align-items: center;
+    gap: 0.5rem;
     position: relative;
 }
 .h_f_com_u_avatar {
-    height: 90%;
+    height: 70%;
     aspect-ratio: 1/1;
     border: 1px solid #666;
     border-radius: 20%;
@@ -199,7 +258,7 @@
 }
 .h_f_com_u_time {
     font-size: 80%;
-    color: #444;
+    color: #aaa;
     position: absolute;
     right: 0;
 }
@@ -209,7 +268,6 @@
     padding: 0.5rem 0;
 }
 .h_f_com_lists {
-    height: 100%;
     position: relative;
     flex: 1;
     overflow: auto;
@@ -219,11 +277,37 @@
 .h_f_com_lists ul {
     width: 100%;
     height: 100%;
-    position: absolute;
+    position: relative;
 }
 .h_f_com_input {
-    height: 3rem;
-    background-color: tomato;
+    background-color: white;
     width: 100%;
 }
+.h_f_com_input form{
+    display: flex;
+    justify-content: space-between;
+}
 
+.h_f_com_input textarea::placeholder {
+    color: #bbb;
+}
+.h_f_com_input textarea {
+    resize: none;
+    border: 0;
+    background-color: transparent;
+    padding: 1rem 1rem 0;
+    flex: 1;
+    font-size: 100%;
+    outline:none;
+    word-break: break-all;
+}
+.h_f_com_input button{
+    cursor: pointer;
+    aspect-ratio: 1/1;
+    border: 0;
+    background-color: transparent;
+    transition: .3s ease;
+}
+.h_f_com_input button:hover{
+    background-color: rgba(65, 105, 225, 0.7);
+}

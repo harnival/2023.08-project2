@@ -8,12 +8,14 @@
     width: 80%;
     margin: auto;
     background-color: #aaa;
-    padding: 1rem;
     box-sizing: border-box;
     position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
+    border: 1px solid black;
+    border-radius: 1.5rem;
+    overflow: hidden;
 }
 .h_new form {
     width: 100%;
@@ -23,16 +25,13 @@
     display: flex;
 }
 .h_new_group ul {
-    border: 2px solid black;
-    left: 100%;
-    top: 0;
+    border-bottom: 1px solid black;
+    padding: 0.5rem 2rem;
+    height: 2rem;
     width: 100%;
     display: flex;
+    align-items: center;
     gap: 1rem;
-}
-.h_new_group li {
-    background-color: black;
-    color: white;
 }
 .h_new textarea{
     resize: none;
@@ -54,7 +53,6 @@
 
 .h_new_content{
     background-color: white;
-    border-radius: 1em;
     font-size: 100%;
     overflow: hidden;
     padding: 0.5em;
@@ -62,6 +60,10 @@
 .h_new_content textarea{
     border: 0;
     outline: none;
+    padding: 1rem 2rem;
+}
+.h_new_content textarea::placeholder {
+    color: #aaa;
 }
 .h_new_c_imageBox {
     display: flex;
@@ -80,14 +82,25 @@
     object-position: center;
 }
 .h_new_c_image button{
+    position: absolute;
+    top: 2%;
+    right: 2%;
     display: block;
     float: right;
     font-size: 0px;
-    width: 1rem;
+    width: 1.5rem;
     aspect-ratio: 1/1;
     border: 0;
     cursor: pointer;
-    background: transparent url('../img/close_button.png') no-repeat center/100%;
+    border-radius: 50%;
+    background:transparent url('../img/close_button.png') no-repeat center/70%;
+    transition: .3s ease;
+}
+.h_new_c_image button:hover{
+    background-color: rgb(0,0,0,0.2);
+}
+.h_new_content_btn {
+    padding: 0 1rem;
 }
 .h_new_content_btn button{
     width: 2rem;
@@ -96,11 +109,37 @@
     border: 0;
     cursor: pointer;
     border-radius: 10%;
-    background: transparent url('../img/image-plus.svg') no-repeat center/90%;
+    background: transparent url('../img/image-plus.svg') no-repeat center/ 80%;
     transition: .3s ease;
 }
 .h_new_content_btn button:hover {
-    background-color: #aaa;
+    background-color: white;
+}
+.h_new_btn{
+    border-top: 1px solid black;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 1rem;
+}
+.h_new_submit,
+.h_new_cancel {
+    cursor: pointer;
+    border: 0;
+    padding: 0.5rem 1rem;
+    margin-left: 1rem;
+    border-radius: 1rem;
+    background-color: royalblue;
+    color: white;
+    font-size: 100%;
+    transition: .3s ease;
+    font-weight: 600;
+}
+.h_new_submit:hover,
+.h_new_cancel:hover {
+    background-color: white;
+    color: royalblue;
 }
 /* ==================================================================== */
 /* 

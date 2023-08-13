@@ -58,15 +58,7 @@ export default function Home(){
                         // 작성자 정보
                         const userDb = await getDoc(doc(useFirestore,'account',postData.uid))
                         const data2 = userDb.data();
-                        // 시간 변환
-                        const time = postData.time * 1000;
-                        const timeObj = {
-                            year : new Date(time).getFullYear(),
-                            month : new Date(time).getMonth() +1,
-                            date : new Date(time).getDate(),
-                            hour : new Date(time).getHours() <10? "0"+new Date(time).getHours() : new Date(time).getHours(),
-                            minute : new Date(time).getMinutes() <10? "0"+new Date(time).getMinutes() : new Date(time).getMinutes(),
-                        }
+                        
                         // 댓글 정보
                         let commentUserArr = [];
                         if(postData.comment.length !== 0){
@@ -105,7 +97,7 @@ export default function Home(){
                             user_name : data2.general.name, 
                             user_id : data2.general.id , 
                             user_photo : data2.general.photoURL, 
-                            time : timeObj, 
+                            // time : timeObj, 
                             userInfo : commentUserArr, 
                             postID : postDoc.id,
                             group : {...groupObj}
@@ -114,7 +106,6 @@ export default function Home(){
                         setfeedLoading(false)
                     }
                 })
-                // return () => unsub()
             })
         }
 
@@ -233,25 +224,25 @@ export default function Home(){
     }
 
     // comment //
-    let commentUnit = useRef()
-    const setComment = function(event, postID){
-        event.preventDefault();
-        const formData = new FormData(event.target);
-        const data = Object.fromEntries(formData.entries());
-        console.log(data)
-        const posting = {
-            uid : useAuth.currentUser.uid,
-            text : data.text,
-            time : Timestamp.now().seconds
-        }
-        const db = doc(useFirestore,'posts',postID);
-        updateDoc(db,{
-            comment : arrayUnion(posting)
-        })
-        return () => {
-            commentUnit.current.value = ''
-        }
-    }
+    // let commentUnit = useRef()
+    // const setComment = function(event, postID){
+    //     event.preventDefault();
+    //     const formData = new FormData(event.target);
+    //     const data = Object.fromEntries(formData.entries());
+    //     console.log(data)
+    //     const posting = {
+    //         uid : useAuth.currentUser.uid,
+    //         text : data.text,
+    //         time : Timestamp.now().seconds
+    //     }
+    //     const db = doc(useFirestore,'posts',postID);
+    //     updateDoc(db,{
+    //         comment : arrayUnion(posting)
+    //     })
+    //     return () => {
+    //         commentUnit.current.value = ''
+    //     }
+    // }
 
     const blockUser = function(userID){ // 유저 차단 //
         const db = doc(useFirestore,'account',useAuth.currentUser.uid);
@@ -259,105 +250,111 @@ export default function Home(){
             block : arrayUnion(userID)
         })
     }
+    // const contentHeight = useRef();
+    // const commentHeight = useRef();
+    // useEffect(function(){
+    //     if(contentHeight.current && commentHeight.current){
+    //         const  hei1 = contentHeight.current.offsetHeight;
+    //         const  hei2 = commentHeight.current.offsetHeight;
+    //         if( hei1 > hei2){
+    //             commentHeight.current.style.height = `${hei1}px`
+    //         } else if(hei1 < hei2) {
+    //             contentHeight.current.style.height = `${hei2}px`
+    //         }
+    //     }
+    // },[])
 // components ================================================= //
-    const PostComponent1 = memo(({v}) => {
-        const postID = v[0];
-        const postData = v[1]
-        return(
-            <li className='h_f_list'>
-                <div className="h_f_content">
-                    <div className="h_f_c_account">
-                            <div className="h_f_c_acc_avatar">
-                                <img src={postData['user_photo']}/>
-                            </div>
-                            <div className="h_f_c_acc_name">
-                                <strong>{postData['user_name']}</strong><br />
-                                <span>@{postData['user_id']}</span>
-                            </div>
-                        <div className="h_f_c_acc_sub">
-                            <span>{`${postData.time.year}년 ${postData.time.month}월 ${postData.time.date}일 ${postData.time.hour}시 ${postData.time.minute}분`}</span>
-                            <div>
-                                <button type='button'>옵션</button>
-                                {v[1].uid === useAuth.currentUser.uid ? (
-                                    <div className="h_f_c_acc_sub_options">
-                                        <a href="/#" onClick={(e) => {e.preventDefault(); deletePost(postID)}}>삭제</a>
-                                    </div>
-                                ) : (
-                                    <div className="h_f_c_acc_sub_options">
-                                        <a href="/#" onClick={(e) => e.preventDefault()}>신고</a>
-                                        <a href="/#" onClick={(e) => e.preventDefault()}>차단</a>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                    <div className="h_f_c_text">{postData.text}</div>
-                    <div className="h_f_c_image">
-                        <div className="h_f_c_image_slide">
-                            {postData.media.map((v,i) => ( 
-                                <div key={i} className="h_f_c_image_unit">
-                                    <img src={v}/> 
-                                </div>))
-                            }
-                        </div>
-                        <button type='button' className="h_f_c_image_left">왼쪽으로 이동</button>
-                        <button type='button' className="h_f_c_image_right">오른쪽으로 이동</button>
+    // const PostComponent1 = memo(({v}) => {
+    //     const postID = v[0];
+    //     const postData = v[1]
+    //     return(
+    //         <li className='h_f_list'>
+    //             <div className="h_f_content">
+    //                 <div className="h_f_c_account">
+    //                         <div className="h_f_c_acc_avatar">
+    //                             <img src={postData['user_photo']}/>
+    //                         </div>
+    //                         <div className="h_f_c_acc_name">
+    //                             <strong>{postData['user_name']}</strong><br />
+    //                             <span>@{postData['user_id']}</span>
+    //                         </div>
+    //                     <div className="h_f_c_acc_sub">
+    //                         <span>{`${postData.time.year}년 ${postData.time.month}월 ${postData.time.date}일 ${postData.time.hour}시 ${postData.time.minute}분`}</span>
+    //                         <div>
+    //                             <button type='button'>옵션</button>
+    //                             {v[1].uid === useAuth.currentUser.uid ? (
+    //                                 <div className="h_f_c_acc_sub_options">
+    //                                     <a href="/#" onClick={(e) => {e.preventDefault(); deletePost(postID)}}>삭제</a>
+    //                                 </div>
+    //                             ) : (
+    //                                 <div className="h_f_c_acc_sub_options">
+    //                                     <a href="/#" onClick={(e) => e.preventDefault()}>신고</a>
+    //                                     <a href="/#" onClick={(e) => e.preventDefault()}>차단</a>
+    //                                 </div>
+    //                             )}
+    //                         </div>
+    //                     </div>
+    //                 </div>
+    //                 <div className="h_f_c_text">{postData.text}</div>
+    //                 <div className="h_f_c_image">
+    //                     <div className="h_f_c_image_slide">
+    //                         {postData.media.map((v,i) => ( 
+    //                             <div key={i} className="h_f_c_image_unit">
+    //                                 <img src={v}/> 
+    //                             </div>))
+    //                         }
+    //                     </div>
+    //                     <button type='button' className="h_f_c_image_left">왼쪽으로 이동</button>
+    //                     <button type='button' className="h_f_c_image_right">오른쪽으로 이동</button>
 
-                    </div>
-                </div>
-                <div className="h_f_comment">
-                    <div className="h_f_com_like">
-                        <div>
-                            <button type='button'>likes</button>
-                            <span>{postData.like}</span>
-                        </div>
-                        <div>
-                            <button type='button'>send</button>
-                        </div>
-                    </div>
-                    <div className="h_f_com_lists">
-                        <ul>
-                            { !postData.comment.length? (
-                                <li>댓글이 없습니다</li>
-                            ): (
-                                postData.comment.map((val,idx) => {return(
-                                    <li className="h_f_com_unit" key={"comment_"+idx}>
-                                        <div className="h_f_com_u_account">
-                                            <div className="h_f_com_u_avatar" onClick={(e) => navigate(`/account/${val.uid}`)}>
-                                                <img src={postData.userInfo.find(v => v.uid === val.uid).photoURL} />
-                                            </div>
-                                            <div className="h_f_com_u_name">@{postData.userInfo.find(v => v.uid === val.uid).id}</div>
-                                            <div className="h_f_com_u_time">{postData.time.seconds}</div>
-                                        </div>
-                                        <div className="h_f_com_u_text">{val.text}</div>
-                                    </li>
-                                )})
-                            )
+    //                 </div>
+    //             </div>
+    //             <div className="h_f_comment">
+    //                 <div className="h_f_com_like">
+    //                     <div>
+    //                         <button type='button'>likes</button>
+    //                         <span>{postData.like}</span>
+    //                     </div>
+    //                     <div>
+    //                         <button type='button'>send</button>
+    //                     </div>
+    //                 </div>
+    //                 <div className="h_f_com_lists">
+    //                     <ul>
+    //                         { !postData.comment.length? (
+    //                             <li>댓글이 없습니다</li>
+    //                         ): (
+    //                             postData.comment.map((val,idx) => {return(
+    //                                 <li className="h_f_com_unit" key={"comment_"+idx}>
+    //                                     <div className="h_f_com_u_account">
+    //                                         <div className="h_f_com_u_avatar" onClick={(e) => navigate(`/account/${val.uid}`)}>
+    //                                             <img src={postData.userInfo.find(v => v.uid === val.uid).photoURL} />
+    //                                         </div>
+    //                                         <div className="h_f_com_u_name">@{postData.userInfo.find(v => v.uid === val.uid).id}</div>
+    //                                         <div className="h_f_com_u_time">{postData.time.seconds}</div>
+    //                                     </div>
+    //                                     <div className="h_f_com_u_text">{val.text}</div>
+    //                                 </li>
+    //                             )})
+    //                         )
 
-                            }
-                        </ul>
-                    </div>
-                    <div className="h_f_com_input">
-                        <form onSubmit={(e)=> setComment(e, postID)}>
-                            <input type="text" name='text'/>
-                            <button>submit</button>
-                        </form>
-                    </div>
-                </div>
-            </li>
-        )
-    }
-    )
+    //                         }
+    //                     </ul>
+    //                 </div>
+    //                 <div className="h_f_com_input">
+    //                     <form onSubmit={(e)=> setComment(e, postID)}>
+    //                         <input type="text" name='text'/>
+    //                         <button>submit</button>
+    //                     </form>
+    //                 </div>
+    //             </div>
+    //         </li>
+    //     )
+    // }
+    // )
 
-    const HomeUnitPostComponent = memo(({v}) => PostComponent({v}))
-
-    const DetailComponent = function({postID}){
-        return(
-            <div className="h_postDetail">
-
-            </div>
-        )
-    }
+    const HomeUnitPostComponent = memo((v) => PostComponent(v))
+   
     
     const ReportComponent = function(){
         const close = function(e){
@@ -423,17 +420,34 @@ export default function Home(){
                     <div className="h_new">
                         <form onSubmit={(e) => setPost(e)}>
                             <div className='h_new_group'>
-                                <input ref={showGroup} type="text" readOnly={true} placeholder='그룹 선택'/>
-                                <input ref={selectGroup} type="hidden" name='group'/>
-                                <ul>
-                                    <li onClick={(e) => {selectGroup.current.value = ""; showGroup.current.value = "그룹 없음"}}>그룹 없음</li>
-                                    {Object.entries(store.getState().setCurrentUser.group).map(v => 
-                                        <li key={v[0]} onClick={(e) => {selectGroup.current.value = v[0]; showGroup.current.value = v[1]}}>{v[1]}</li>
-                                    )}
-                                </ul>
+                                {/* <input ref={showGroup} type="text" readOnly={true} placeholder='그룹 선택'/>
+                                <input ref={selectGroup} type="hidden" name='group'/> */}
+                                {store.getState().setCurrentUser.group == {}? (
+                                    <ul>
+                                        <li className='h_new_noGroup'>그룹 없음</li>
+                                    </ul>
+                                ):(
+                                    <ul>
+                                        <li
+                                        // onClick={(e) => {selectGroup.current.value = ""; showGroup.current.value = "그룹 없음"}}
+                                        >
+                                            <input type="radio" name="group" value=""  id="radio_default" hidden={true}/>
+                                            <label htmlFor="radio_default">그룹 없음</label>
+                                        </li>
+                                        {Object.entries(store.getState().setCurrentUser.group).map(v => 
+                                            <li key={v[0]}
+                                            // onClick={(e) => {selectGroup.current.value = v[0]; showGroup.current.value = v[1]}}
+
+                                            >
+                                                <input type="radio" name="group" value={v[0]} id={`radio_${v[0]}`} hidden={true}  onChange={()=> console.log(v[0])}/>
+                                                <label htmlFor={`radio_${v[0]}`}>{v[1]}</label>
+                                            </li>
+                                        )}
+                                    </ul>
+                                )}
                             </div>
                             <div className='h_new_content'>
-                                <textarea ref={textArea} name="text" id="" maxLength="200" onFocus={(e)=>textareaFocus(e)} onBlur={(e)=>textareaBlur(e)}></textarea>
+                                <textarea ref={textArea} name="text" id="" maxLength="200" onFocus={(e)=>textareaFocus(e)} onBlur={(e)=>textareaBlur(e)} placeholder='오늘의 소식을 알리세요.'></textarea>
                                 <div className='h_new_c_imageBox'>
                                     {selectImage.map((v,i) => (
                                         <div className="h_new_c_image" key={`selectImage_${i}`}>
@@ -443,13 +457,15 @@ export default function Home(){
                                     ))}
                                     <input ref={input => fileInput = input} type="file" hidden={true} accept='image/*' onChange={(e) => postImage(e)}/>
                                 </div>
+                            </div>
+                            <div className="h_new_btn">
                                 <div className="h_new_content_btn">
                                     <button type='button' onClick={(e) => clickToImage(e)}>사진 업로드</button>
                                 </div>
-                            </div>
-                            <div className="h_new_btn">
-                                <button type='submit' className='h_new_submit'>게시</button>
-                                <button type='button' className='h_new_cancel'>취소</button>
+                                <div>
+                                    <button type='submit' className='h_new_submit'>게시</button>
+                                    <button type='button' className='h_new_cancel'>취소</button>
+                                </div>
                             </div>
                         </form>
                     </div>
@@ -458,10 +474,12 @@ export default function Home(){
                             {!Object.entries(postFeed).length? (
                                 <div>텅텅.....</div>
                             ) : (
-                                Object.entries(postFeed).sort((a,b) => a[1].time - b[1].time).map((v,i) => (   
-                                // <PostComponent v={v} key={v[0]}/>
-                                < HomeUnitPostComponent v={v} key={v[0]}/>
-                                ))
+                                Object.entries(postFeed).sort((a,b) => a[1].time - b[1].time).reverse().map((v,i) => {
+                                    
+                                    
+                                    return(   
+                                        < HomeUnitPostComponent postData={v[1]} postID={v[0]} key={`post_${v[0]}`}/>
+                                )})
                             )}
                         </ul>
                     </div>

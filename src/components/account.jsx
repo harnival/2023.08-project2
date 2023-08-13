@@ -165,8 +165,8 @@ export default function Account(props){
 
     useEffect(function(){   // 그룹 정보 로드
         async function groupLoad(){
-            const group = userInfo.group;
-            const maps = await Promise.all(group.map(async(v) => {
+            const groups = userInfo.group;
+            const maps = await Promise.all(Object.keys(groups).map(async(v) => {
                 const groupDB = doc(useFirestore,'groups',v);
                 const groupData = await getDoc(groupDB);
                 const groupData2 = groupData.data();
@@ -175,7 +175,9 @@ export default function Account(props){
             }))
             setgroupList(state => [...maps])
         }
-        groupLoad()
+        if(userInfo.group){
+            groupLoad()
+        }
     },[userInfo])
     const sendMessage = function(){
         if(userID !== useAuth.currentUser.uid){
@@ -235,6 +237,16 @@ export default function Account(props){
         return(
             <li className='acc_f_list' >
                 <div className="acc_f_content">
+                    {!!v.group.title && (
+                        <div className="acc_f_c_group">
+                            <div className="acc_f_c_g_image">
+                                <img src={v.group.photoURL} />
+                            </div>
+                            <div className="acc_f_c_g_title">
+                                <span># {v.group.title}</span>
+                            </div>
+                        </div>
+                    ) }
                     <div className="acc_f_c_account">
                             <div className="acc_f_c_acc_avatar">
                                 <img src={v['user_photo']}/>
@@ -259,8 +271,8 @@ export default function Account(props){
                                         <img src={v}/> 
                                     </div>))}
                             </div>
-                            <button type='button' className="acc_f_c_image_left">왼쪽으로 이동</button>
-                            <button type='button' className="acc_f_c_image_right">오른쪽으로 이동</button>
+                            <button type='button' className="acc_f_c_image_left"><img src="/img/icons/arrow_back.png" />왼쪽으로 이동</button>
+                            <button type='button' className="acc_f_c_image_right"><img src="/img/icons/arrow_forward.png" />오른쪽으로 이동</button>
 
                         </div>
                     ): null}
@@ -284,7 +296,7 @@ export default function Account(props){
                                             <img src={v.userInfo.find(v => v.uid === val.uid).photoURL} />
                                         </div>
                                         <div className="acc_f_com_u_name">@{v.userInfo.find(v => v.uid === val.uid).id}</div>
-                                        <div className="acc_f_com_u_time">{changeTime(val.time.seconds)}</div>
+                                        <div className="acc_f_com_u_time">{changeTime(val.time)}</div>
                                     </div>
                                     <div className="acc_f_com_u_text">{val.text}</div>
                                 </li>
