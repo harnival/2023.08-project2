@@ -28,7 +28,7 @@
     object-position: center;
 }
 .acc_i_a_avatar {
-    width: 50%;
+    width: 40%;
     aspect-ratio: 1/1;
     border: 1px solid black;
     border-radius: 20%;
@@ -89,16 +89,30 @@
 .acc_feed {
     width: 70%;
 }
+.acc_posts {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+}
 .acc_f_list {
     width: 90%;
     margin: auto;
-    background-color: white;
 }
 .acc_f_c_group {
+    width: fit-content;
     height: 2rem;
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    background-color: royalblue;
+    padding: 0.3rem 1rem;
+    border-radius: 1rem;
+    color: white;
+    cursor: pointer;
+}
+.acc_f_content{
+    padding-bottom: 2rem;
+    padding-top: 1rem;
 }
 .acc_f_c_g_image {
     height: 90%;
@@ -122,7 +136,7 @@
     position: relative;
 }
 .acc_f_c_acc_avatar {
-    height: 90%;
+    height: 60%;
     aspect-ratio: 1/1;
     border: 1px solid #666;
     border-radius: 20%;
@@ -204,25 +218,118 @@
     height: 100%;
     background-color: white;
 }
-.acc_f_comment {
-    background-color: white;
+.acc_f_c_acc_sub {
+    position: absolute;
+    right: 0;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+.acc_f_c_acc_sub_box{
     position: relative;
-    height: 30vh;
-    overflow-y: auto;
+}
+.acc_f_c_acc_sub > span {
+    font-size: 80%;
+    color: #444;
+}
+.acc_f_c_acc_sub_options {
+    background-color: white;
+    box-shadow: 1px 2px 5px 0px rgb(0,0,0,0.5);
+    position: absolute;
+    top: 0;
+    right: 100%;
+}
+.acc_f_c_acc_sub_options button:hover{
+    background-color: #aaa;
+}
+.acc_f_c_acc_sub_options button{
+    text-align: center;
+    min-width: 5rem;
+    display: block;
+    padding: 0.5rem;
+    border: 0;
+    cursor: pointer;
+    transition: .3s ease;
+}
+
+.acc_f_c_acc_optionBtn{
+    width: 2rem;
+    height: 2rem;
+    font-size: 0;
+    background: url('../img/dots-vertical.svg') no-repeat center / 80%;
+    cursor: pointer;
+    border: 0;
+}
+
+
+
+
+.acc_f_comment {
+    background-color: #eee;
+    position: relative;
+    width: 100%;
+    border-radius: 1.5rem;
+    overflow: hidden;
 }
 .acc_f_comment ul {
     display: flex;
     flex-direction: column;
     justify-content: end;
+    overflow-y: auto;
 }
 .acc_f_com_like {
-    position: sticky;
-    top: 0;
     width: 100%;
-    background-color: tomato;
+    background-color: white;
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 1rem;
+    box-sizing: border-box;
+}
+.acc_f_com_like button:hover{
+    transform: scale(1.2,1.2);
+}
+.acc_f_com_like_like {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.acc_f_com_like_like button{
+    border: 0;
+    width: 1.5rem;
+    height: 1.5rem;
+    font-size: 0;
+    background: url('../img/heart-outline.svg') scroll no-repeat center / 80%;
+    cursor: pointer;
+    transition: .3s ease;
+    transform-origin: 50% 50%;
+}
+.acc_f_com_like_like button.likeChecked{
+    background: url('../img/heart.svg') scroll no-repeat center / 80%;
+}
+.acc_f_com_like_send button {
+    border: 0;
+    width: 1.5rem;
+    height: 1.5rem;
+    font-size: 0;
+    background: url('../img/send.svg') scroll no-repeat center / 80%;
+    cursor: pointer;
+    transition: .3s ease;
+    transform-origin: 50% 50%;
+}
+.acc_f_com_empty{
+    height: 4rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #aaa;
+    width: 100%;
 }
 .acc_f_com_unit {
     border-bottom: 1px solid #eee;
+    width: 100%;
+    padding: 0.5rem;
+    box-sizing: border-box;
 }
 .acc_f_com_u_account {
     height: 3rem;
@@ -246,7 +353,7 @@
 }
 .acc_f_com_u_time {
     font-size: 80%;
-    color: #444;
+    color: #aaa;
     position: absolute;
     right: 0;
 }
@@ -256,9 +363,88 @@
     padding: 0.5rem 0;
 }
 .acc_f_com_input {
-    position: sticky;
-    bottom: 0;
     height: 3rem;
-    background-color: tomato;
     width: 100%;
+    background-color: white;
+}
+.acc_f_com_input form {
+    display: flex;
+    justify-content: space-between;
+}
+.acc_f_com_input textarea {
+    resize: none;
+    border: 0;
+    background-color: transparent;
+    padding: 1rem 1rem 0;
+    flex: 1;
+    font-size: 100%;
+    outline:none;
+    word-break: break-all;
+}
+.acc_f_com_input button {
+    cursor: pointer;
+    aspect-ratio: 1/1;
+    border: 0;
+    background-color: transparent;
+    transition: .3s ease;
+}
+.acc_f_com_input button:hover{
+    background-color: rgba(65, 105, 225, 0.7);
+}
+
+/* ================================================= */
+.acc_group_section1 ul{
+    display: flex;
+    flex-wrap: wrap;
+}
+.acc_group_unit{
+    width: calc(100% / 3);
+    box-sizing: border-box;
+    border-radius: 1.5rem;
+    overflow: hidden;
+    cursor: pointer;
+}
+.acc_group_unit_box{
+    position: relative;
+}
+.acc_g_u_image{
+    width: 100%;
+    aspect-ratio: 1/1;
+    background-color: white;
+}
+.acc_g_u_image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+.acc_g_u_text{
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    bottom: 0;
+    left: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 20%, transparent);
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    box-sizing: border-box;
+}
+.acc_g_u_text_title{
+    color: white;
+    font-size: 120%;
+    font-weight: 600;
+}
+.acc_g_u_text_desc{
+    color: white;
+    font-size: 90%;
+    padding-left: 1rem;
+
+}
+.acc_g_u_text_user{
+    color: #aaa;
+    font-size: 90%;
+    padding-left: 1rem;
 }

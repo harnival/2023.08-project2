@@ -11,12 +11,16 @@ import store from "../store/store";
 export default function GroupUnit(props) {
     let {groupID} = useParams();
     const [currentPage, setcurrentPage] = useState(groupID)
-    const [loadPage, setloadPage] = useState([])
+    const [loadPage, setloadPage] = useState({})
     const [pageInfo, setpageInfo] = useState({})
     const location = useLocation()
 
     useEffect(function(){
-        setpageInfo(state => ({...location.state}))
+        const data = location.state.data;
+        setpageInfo(state => ({...data}))
+    },[])
+    
+    useEffect(function(){   // 그룹 포스트 정보
         const q = query(collection(useFirestore,'posts'),where('group','==',groupID))
         onSnapshot(q, async(snapshotDoc) => {
             const arrs = await Promise.all(
@@ -24,15 +28,7 @@ export default function GroupUnit(props) {
                     // 유저 정보
                     const data1 = await getDoc(doc(useFirestore,'account',v.data().uid));
                     const data2 = data1.data();
-                    // 시간 변환
-                    const time = v.data().time * 1000;
-                    const timeObj = {
-                        year : new Date(time).getFullYear(),
-                        month : new Date(time).getMonth() +1,
-                        date : new Date(time).getDate(),
-                        hour : new Date(time).getHours() <10? "0"+new Date(time).getHours() : new Date(time).getHours(),
-                        minute : new Date(time).getMinutes() <10? "0"+new Date(time).getMinutes() : new Date(time).getMinutes(),
-                    }
+                    
                     // 댓글 목록
                     let commentUserArr = [];
                     if(v.data().comment && v.data().comment.length !== 0){
@@ -73,21 +69,19 @@ export default function GroupUnit(props) {
                         user_name : data2.general.name, 
                         user_id : data2.general.id , 
                         user_photo : data2.general.photoURL, 
-                        time : timeObj, 
                         userInfo : commentUserArr, 
                         postID : v.id,
                         group : {...groupObj}
                     };
                     
-                    return ([v.id, data3])
+                    return setloadPage(state => ({...state, [v.id] : data3}))
                 })
             )
-            setloadPage(state => [...arrs])
         })
     },[currentPage])
 
     // component ============= //
-    const GroupUnitPostComponent = memo(({v}) => PostComponent({v}));
+    const GroupUnitPostComponent = memo(PostComponent);
 
     return(
         <div id="groupUnit">
@@ -99,7 +93,7 @@ export default function GroupUnit(props) {
                     <h3>{pageInfo.title}</h3>
                 </div>
                 <div className="gu_i_desc">
-                    <p>{pageInfo.desc}</p>
+                    <p>{pageInfo.description}</p>
                 </div>
                 <div className="gu_i_users">
                     <p>{pageInfo.user && pageInfo.user.length}명 참여</p>
@@ -138,13 +132,13 @@ export default function GroupUnit(props) {
             </div>
             <div className="gu_main">
                 <ul>
-                    {!loadPage.length? (
+                    {!Object.entries(loadPage).length? (
                         <li>
                             <strong>텅텅....</strong>
                         </li>
                     ):(
-                        loadPage.map(v => (
-                            <GroupUnitPostComponent v={v} key={`groupUnit_${v.postID}`}/>
+                        Object.entries(loadPage).sort((a,b) => a[1].time - b[1].time).map(v => (
+                            <GroupUnitPostComponent postData={v[1]} postID={v[0]} key={`groupUnit_${v.postID}`}/>
                         ))
                     )}
                 </ul>

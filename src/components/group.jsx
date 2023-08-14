@@ -61,9 +61,9 @@ export default function Group(){
         const userDB = doc(useFirestore,'account',useAuth.currentUser.uid);
         const adddocs = await addDoc(groupDB,groupAdd);
         await updateDoc(userDB,{
-            group : {[adddocs.id] : groupAdd.title}
+            group : arrayUnion({[adddocs.id] : groupAdd.title})
         })
-        return navigate(`/group/${adddocs.id}`)
+        return navigate(`/group/${adddocs.id}`, {state : {data : groupAdd}})
     }
     const gNew = useRef();
     const gNewChild = useRef({
@@ -80,7 +80,23 @@ export default function Group(){
             }
         }
     }
-
+    const goToUnit =async function(id){
+        const storeData = store.getState().setGetGroup[id];
+        if(!storeData){
+            const db = doc(useFirestore,'groups',id);
+            const data1 =await getDoc(db);
+            const data2 = data1.data();
+            await store.dispatch({
+                type : 'setSelectGroupData',
+                id : id,
+                data : data2
+            })
+            return navigate(`${id}`,{state : {data : data2}})
+        } else {
+            const data3 = await store.getState().setGetGroup[id];
+            return navigate(`${id}`,{state : {data : data3}})
+        }
+    }
     function GroupMain(){
         return(
             <div className="g_b_main">
@@ -88,12 +104,10 @@ export default function Group(){
                     <h3>내가 참여한 그룹</h3>
                     <ul>
                         {callGroup.map(v => (
-                        <li className='g_b_my_list' key={`group_${v.id}`}>
+                        <li className='g_b_my_list' key={`group_${v.id}`} onClick={() => goToUnit(v.id)}>
                             <div className="g_b_my_img">
                                 <div className="g_b_img_wrap">
-                                    <Link to={`${v.id}`} state={{title : v.title, desc : v.description, photoURL : v.photoURL, user : [...v.user]}}>
-                                        <img src={v.photoURL? v.photoURL : null}/>
-                                    </Link>
+                                    <img src={v.photoURL? v.photoURL : null}/>
                                 </div>
                                 <div className="g_b_my_alarm"></div>
                             </div>

@@ -1,4 +1,4 @@
-import { getDoc, onSnapshot, doc, query, collection, orderBy, getDocs, where, addDoc, updateDoc, arrayUnion, Timestamp } from 'firebase/firestore';
+import { getDoc, onSnapshot, doc, query, collection, deleteDoc, getDocs, where, addDoc, updateDoc, arrayUnion, Timestamp, arrayRemove } from 'firebase/firestore';
 import '../css/account.css'
 import { useEffect, useState, useRef, useCallback, memo } from 'react';
 import { useAuth, useFirestore } from '../datasource/firebase';
@@ -100,15 +100,7 @@ export default function Account(props){
             const dataArr = await Promise.all(
                 snapshotDoc.docs.map(async(v) => {
                     const postData = v.data();
-                    // 시간 변환
-                    const time = postData.time * 1000;
-                    const timeObj = {
-                        year : new Date(time).getFullYear(),
-                        month : new Date(time).getMonth() +1,
-                        date : new Date(time).getDate(),
-                        hour : new Date(time).getHours() <10? "0"+new Date(time).getHours() : new Date(time).getHours(),
-                        minute : new Date(time).getMinutes() <10? "0"+new Date(time).getMinutes() : new Date(time).getMinutes(),
-                    }
+                    
                     // 댓글 목록
                     let commentUserArr = [];
                     if(postData.comment.length !== 0){
@@ -148,7 +140,6 @@ export default function Account(props){
                         user_name : userInfo.name, 
                         user_id : userInfo.id , 
                         user_photo : userInfo.photoURL, 
-                        time : timeObj, 
                         userInfo : commentUserArr, 
                         postID : v.id,
                         group : {...groupObj}
@@ -228,12 +219,77 @@ export default function Account(props){
         }
     }
 
+    const timeInvert = function(value){
+        const time = value * 1000;
+        const timeObj = {
+            year : new Date(time).getFullYear(),
+            month : new Date(time).getMonth() +1,
+            date : new Date(time).getDate(),
+            hour : new Date(time).getHours() <10? "0"+new Date(time).getHours() : new Date(time).getHours(),
+            minute : new Date(time).getMinutes() <10? "0"+new Date(time).getMinutes() : new Date(time).getMinutes(),
+        }
+        return `${timeObj.year}/${timeObj.month}/${timeObj.date} ${timeObj.hour}:${timeObj.minute}`
+    }
+
+    const deletePost = async function(postID){  // 게시물 삭제 //
+        const postDB = doc(useFirestore,'posts',postID)
+        const likeQuery = query(collection(useFirestore,'account'),where('like','array-contains',postID))
+
+        await getDocs(likeQuery, (snapshot) => {
+            snapshot.docs.forEach(v => {
+                const userUid = v.id;
+                const data = v.data();
+                const userDB = doc(useFirestore,'account',userUid);
+                updateDoc(userDB,{
+                    like : data.like.filter(val => val !== postID)
+                })
+            })
+        })
+        await deleteDoc(postDB);
+    }
+    
 //  components ============================================================== //
     const PostComponent = memo(function({data, idx}){
         const postID = data[0];
         const v = data[1]
         const i = idx;
 
+        const [clickOpenOption, setclickOpenOption] = useState(false)
+        const checkLike = function(){       // 좋아요 클릭 시 반응
+            const likeDB = doc(useFirestore,'posts', postID);
+            const me = useAuth.currentUser.uid;
+            if(v.like.includes(me)){
+                updateDoc(likeDB,{
+                    like : arrayRemove(me)
+                })
+            } else {
+                updateDoc(likeDB,{
+                    like : arrayUnion(me)
+                })
+            }
+        }
+        const [likeText, setlikeText] = useState('')
+        useEffect(function(){       // 좋아요 상태에 따른 문구 설정
+            async function getFirstLike(){
+                if(v.like && !!v.like.length){
+                    const getID = await getDoc(doc(useFirestore,'account',v.like[0]))
+                    const getUser = getID.data().general.id;
+                    if(v.like.length === 1){
+                        setlikeText(state => `@${getUser} 님이 좋아합니다.`)
+                    } else if( v.like.length > 1) {
+                        setlikeText(state => `@${getUser}님 외 ${v.like.length-1}명이 좋아합니다.`)
+                    }
+                } else if (v.like.length === 0){
+                    setlikeText(state => '0')
+                }
+            }
+            getFirstLike()
+        },[v.like])
+        const textareaHeight = function(e){
+            const q = e.target;
+            q.style.height = '1px'
+            q.style.height = `${q.scrollHeight}px`
+        }
         return(
             <li className='acc_f_list' >
                 <div className="acc_f_content">
@@ -256,9 +312,21 @@ export default function Account(props){
                                 <span>@{v['user_id']}</span>
                             </div>
                         <div className="acc_f_c_acc_sub">
-                            <span>{`${v.time.year}년 ${v.time.month}월 ${v.time.date}일 ${v.time.hour}시 ${v.time.minute}분`}</span>
-                            <div>
-                                <button type='button'>옵션</button>
+                            <span>{timeInvert(v.time)}</span>
+                            <div className='acc_f_c_acc_sub_box'>
+                                <button  type='button' className="acc_f_c_acc_optionBtn" onClick={(e) => setclickOpenOption(state => !state)}>옵션</button>
+                                {clickOpenOption && (
+                                    <div className="acc_f_c_acc_sub_options">
+                                    {userID === useAuth.currentUser.uid ? (
+                                            <button onClick={(e) => deletePost(postID)}>삭제</button>
+                                    ) : (
+                                        <>
+                                            <a href="/#" onClick={(e) => e.preventDefault()}>신고</a>
+                                            <a href="/#" onClick={(e) => e.preventDefault()}>차단</a>
+                                        </>
+                                    )}
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -279,11 +347,11 @@ export default function Account(props){
                 </div>
                 <div className="acc_f_comment">
                     <div className="acc_f_com_like">
-                        <div>
-                            <button type='button'>likes</button>
-                            <span>{v.like}</span>
+                        <div className='acc_f_com_like_like'>
+                            <button type='button' onClick={() => checkLike()} className={ v.like.includes(useAuth.currentUser.uid) && `likeChecked`}>likes</button>
+                            <span>{v.like && likeText}</span>
                         </div>
-                        <div>
+                        <div className='acc_f_com_like_send'>
                             <button type='button'>send</button>
                         </div>
                     </div>
@@ -302,23 +370,51 @@ export default function Account(props){
                                 </li>
                             ))
                         ) : (
-                            <li>댓글이 없습니다.</li>
+                            <li className='acc_f_com_empty'>댓글이 없습니다.</li>
                         )}
-                        <li className="acc_f_com_input">
-                            <form onSubmit={(e)=> setComment(e, postID)}>
-                                <input type="text" name='text'/>
-                                <button>submit</button>
-                            </form>
-                        </li>
                     </ul>
+                    <div className="acc_f_com_input">
+                        <form onSubmit={(e)=> setComment(e, postID)}>
+                            <textarea name="text" maxLength={120} onInput={(e) => textareaHeight(e)} placeholder="답글을 입력하세요."></textarea>
+                            <button>submit</button>
+                        </form>
+                    </div>
                 </div>
             </li>
         )
     })
     const GroupComponent = memo(function({data}){
+        const groupID = data[0];
+        const groupData = data[1];
+        const goToUnit =async function(id){
+            const storeData = store.getState().setGetGroup[id];
+            if(!storeData){
+                const db = doc(useFirestore,'groups',id);
+                const data1 =await getDoc(db);
+                const data2 = data1.data();
+                await store.dispatch({
+                    type : 'setSelectGroupData',
+                    id : id,
+                    data : data2
+                })
+                return navigate(`/group/${id}`,{state : {data : data2}})
+            } else {
+                const data3 = await store.getState().setGetGroup[id];
+                return navigate(`/group/${id}`,{state : {data : data3}})
+            }
+        }
         return(
-            <li>
-
+            <li className='acc_group_unit' onClick={() => goToUnit(groupID)}>
+                <div className="acc_group_unit_box">
+                    <div className="acc_g_u_image">
+                        <img src={groupData.photoURL} />
+                    </div>
+                    <div className="acc_g_u_text">
+                        <p className='acc_g_u_text_title'># {groupData.title}</p>
+                        <p className='acc_g_u_text_desc'>{groupData.description}</p>
+                        <p className='acc_g_u_text_user'>{groupData.user.length}명 참여</p>
+                    </div>
+                </div>
             </li>
         )
     })
@@ -377,16 +473,21 @@ export default function Account(props){
                             <p><strong>차단한 유저입니다.</strong></p>
                         </div>
                     ): userPage === 0 ? (
-                        <ul>
-                            {callPost.map((v,i) => (
+                        <ul className='acc_posts'>
+                            {callPost.sort((a,b) => a[1].time - b[1].time).reverse().map((v,i) => (
                                 <PostComponent data={v} idx={i} key={v['uid'] + "_" + i}/>
                             ))}
                         </ul>
                     ) : userPage === 1 ? (
                         <div className='acc_group'>
-                            <ul>
-
-                            </ul>
+                            <div className='acc_group_section1'>
+                                <h3>참여 중인 그룹</h3>
+                                <ul>
+                                    {groupList.map(v => (
+                                        <GroupComponent data={v} key={`group_${v[0]}`}/>
+                                    ))}
+                                </ul>
+                            </div>
                         </div>
                     ) : userPage === 2 ? (
                         <div className='acc_like'>

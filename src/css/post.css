@@ -24,6 +24,7 @@
     padding: 0.3rem 1rem;
     border-radius: 1rem;
     color: white;
+    cursor: pointer;
 }
 .h_f_c_g_image {
     height: 90%;
@@ -261,6 +262,9 @@
     color: #aaa;
     position: absolute;
     right: 0;
+}
+.h_f_com_u_name {
+    font-size: 80%;
 }
 .h_f_com_u_text{
     width: 90%;

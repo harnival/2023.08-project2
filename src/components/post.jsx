@@ -4,14 +4,14 @@ import { Timestamp, updateDoc, doc, query, collection, where, getDocs, deleteDoc
 import { useNavigate } from "react-router-dom";
 import { useFirestore } from "../datasource/firebase";
 import { useRef, useState, useEffect, memo } from "react";
-
+import store from "../store/store";
 import '../css/post.css'
 
 export default function PostComponent({postData ,postID}){
 
     const commentData = postData.comment;
     const likeData = postData.like;
-    const commentUser = postData.userInfo;
+    const commentUser = postData.userInfo
     const otherData = {
         ...postData,
         comment : null,
@@ -27,7 +27,8 @@ export default function PostComponent({postData ,postID}){
             hour : new Date(time).getHours() <10? "0"+new Date(time).getHours() : new Date(time).getHours(),
             minute : new Date(time).getMinutes() <10? "0"+new Date(time).getMinutes() : new Date(time).getMinutes(),
         }
-        return  `${timeObj.year}년 ${timeObj.month}월 ${timeObj.date}일 ${timeObj.hour}시 ${timeObj.minute}분`
+        // return  `${timeObj.year}년 ${timeObj.month}월 ${timeObj.date}일 ${timeObj.hour}시 ${timeObj.minute}분`
+        return  `${timeObj.year}/${timeObj.month}/${timeObj.date} ${timeObj.hour}:${timeObj.minute}`
     }
     const [likeText, setlikeText] = useState('')
     useEffect(function(){       // 좋아요 상태에 따른 문구 설정
@@ -124,7 +125,23 @@ export default function PostComponent({postData ,postID}){
         q.style.height = '1px'
         q.style.height = `${q.scrollHeight}px`
     }
-
+    const goToUnit =async function(id){
+        const storeData = store.getState().setGetGroup[id];
+        if(!storeData){
+            const db = doc(useFirestore,'groups',id);
+            const data1 =await getDoc(db);
+            const data2 = data1.data();
+            await store.dispatch({
+                type : 'setSelectGroupData',
+                id : id,
+                data : data2
+            })
+            return navigate(`/group/${id}`,{state : {data : data2}})
+        } else {
+            const data3 = await store.getState().setGetGroup[id];
+            return navigate(`/group/${id}`,{state : {data : data3}})
+        }
+    }
     // =============================================
 
     function Content({postData}){
@@ -204,7 +221,7 @@ export default function PostComponent({postData ,postID}){
         <li className='h_f_list'>
         {!!postData.group.title && (
             <div className="h_f_c_groupWrap">
-                <div className="h_f_c_group">
+                <div className="h_f_c_group" onClick={() => goToUnit(postData.group.id)}>
                     <div className="h_f_c_g_image">
                         <img src={postData.group.photoURL} />
                     </div>
@@ -217,46 +234,48 @@ export default function PostComponent({postData ,postID}){
         <div className="h_f_list_box">
             <ContentComponent  postData={otherData}/>
             <div className="h_f_comment" ref={commentHeight}>
-            <div className="h_f_commentBox">
-                <div className="h_f_com_lists">
-                    <ul>
-                        { !commentData.length? (
-                            <li className="no_reply">댓글이 없습니다.</li>
-                        ): (
-                            commentData.map((val,idx) => {return(
-                                <li className="h_f_com_unit" key={"comment_"+idx}>
-                                    <div className="h_f_com_u_account">
-                                        <div className="h_f_com_u_avatar" onClick={(e) => navigate(`/account/${val.uid}`)}>
-                                            <img src={commentUser.find(v => v.uid === val.uid).photoURL} />
+                <div className="h_f_commentBox">
+                    <div className="h_f_com_lists">
+                        <ul>
+                            { !commentData.length? (
+                                <li className="no_reply">댓글이 없습니다.</li>
+                            ): (
+                                commentData.map((val,idx) => {return(
+                                    <li className="h_f_com_unit" key={"comment_"+idx}>
+                                        <div className="h_f_com_u_account">
+                                            <div className="h_f_com_u_avatar" onClick={(e) => navigate(`/account/${val.uid}`)}>
+                                                <img src={commentUser.find(v => v.uid === val.uid).photoURL} />
+                                            </div>
+                                            <div className="h_f_com_u_name">@{commentUser.find(v => v.uid === val.uid).id}</div>
+                                            
                                         </div>
-                                        <div className="h_f_com_u_name">@{commentUser.find(v => v.uid === val.uid).id}</div>
-                                        <div className="h_f_com_u_time">{invertTime(val.time)}</div>
-                                    </div>
-                                    <div className="h_f_com_u_text">{val.text}</div>
-                                </li>
-                            )})
-                        )
+                                        <div className="h_f_com_u_text">{val.text}
+                                            <div className="h_f_com_u_time">{invertTime(val.time)}</div>
+                                        </div>
+                                    </li>
+                                )})
+                            )
 
-                        }
-                    </ul>
-                </div>
-                <div className="h_f_com_like">
-                    <div className="h_f_com_like_likeWrap">
-                        <button onClick={() => checkLike()} type='button' className={`h_f_com_like_like ` + (likeData.includes(useAuth.currentUser.uid) && `likeChecked`)}>likes</button>
-                        <p>{likeData && likeText}</p>
+                            }
+                        </ul>
                     </div>
-                    <div className="h_f_com_like_sendWrap">
-                        <button type='button'>send</button>
+                    <div className="h_f_com_like">
+                        <div className="h_f_com_like_likeWrap">
+                            <button onClick={() => checkLike()} type='button' className={`h_f_com_like_like ` + (likeData.includes(useAuth.currentUser.uid) && `likeChecked`)}>likes</button>
+                            <p>{likeData && likeText}</p>
+                        </div>
+                        <div className="h_f_com_like_sendWrap">
+                            <button type='button'>send</button>
+                        </div>
+                    </div>
+                    <div className="h_f_com_input">
+                        <form onSubmit={(e)=> setComment(e, postID)}>
+                            <textarea name="text" maxLength={120} onInput={(e) => textareaHeight(e)} placeholder="답글을 입력하세요."></textarea>
+                            {/* <input type="text" name='text'/> */}
+                            <button>답글</button>
+                        </form>
                     </div>
                 </div>
-                <div className="h_f_com_input">
-                    <form onSubmit={(e)=> setComment(e, postID)}>
-                        <textarea name="text" maxLength={120} onInput={(e) => textareaHeight(e)} placeholder="답글을 입력하세요."></textarea>
-                        {/* <input type="text" name='text'/> */}
-                        <button>답글</button>
-                    </form>
-                </div>
-            </div>
             </div>
         </div>
     </li>

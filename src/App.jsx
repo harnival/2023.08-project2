@@ -13,18 +13,13 @@ import './css/app.css';
 
 export default function App(){
   const navigate = useNavigate();
-  const [mainState, setmainState] = useState('Home');
-  const changeMainState = function(val){
-    setmainState(state => val);
-  }
   useEffect(function(){
     onAuthStateChanged(useAuth,(user) => {
       if(user){
         const userDb = doc(useFirestore, 'account', user.uid);
-        const unsub = onSnapshot(userDb, (snapshot) => {
+        const unsub = onSnapshot(userDb, async(snapshot) => {
           const data = snapshot.data();
-          store.dispatch({type : 'setCurrentUser_Login' , info : data})
-          console.log("[currentUser]",useAuth.currentUser)
+          await store.dispatch({type : 'setCurrentUser_Login' , info : data})
           navigate('/')
         })
         return () => unsub()
