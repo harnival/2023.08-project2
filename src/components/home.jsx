@@ -22,6 +22,26 @@ export default function Home(){
     const [selectImage, setselectImage] = useState([]);
 
 
+    // useEffect(function(){   // 게시물 데이터베이스에 호출
+    //     const myGroup = Object.keys(store.getState().setCurrentUser.group)
+    //     const myFollower = store.getState().setCurrentUser.follower;        
+    //         myFollower.push(useAuth.currentUser.uid);
+    //     const q = !myGroup.length ? (
+    //         query(collection(useFirestore,'posts'),where('uid', 'in', myFollower))
+    //         ) : (
+    //         query(collection(useFirestore,'posts'),or(
+    //             where('group','in', myGroup),
+    //             where('uid', 'in',myFollower)
+    //         ))
+    //     );
+
+    //     const unsub = onSnapshot(q, (snapshotDoc) => {
+    //         const docArr = snapshotDoc.docs;
+    //         const docArr2 = [...docArr.map(v => v.id)]
+    //         setpostIds(state => docArr2)
+    //     })
+    //     return () => unsub();
+    // },[])
     useEffect(function(){   // 게시물 데이터베이스에 호출
         const myGroup = Object.keys(store.getState().setCurrentUser.group)
         const myFollower = store.getState().setCurrentUser.follower;        
@@ -35,81 +55,131 @@ export default function Home(){
             ))
         );
 
-        const unsub = onSnapshot(q, (snapshotDoc) => {
+        const unsub = onSnapshot(q, async(snapshotDoc) => {
             const docArr = snapshotDoc.docs;
-            const docArr2 = [...docArr.map(v => v.id)]
-            setpostIds(state => docArr2)
+            const myBlock =  store.getState().setCurrentUser.block;
+            const docArr1 = docArr.filter(v => !myBlock.includes(v.data().uid))
+            const docArr2 = await Promise.all(docArr1.map(async(v) => {
+                const postData = v.data()
+                const userDb = await getDoc(doc(useFirestore,'account',postData.uid))
+                const data2 = userDb.data();
+                
+                // 댓글 정보
+                let commentUserArr = [];
+                if(postData.comment.length !== 0){
+                    const comments = postData.comment.map(v => v.uid);
+                    const commentUser = [...new Set(comments)]
+                    const userData1 = await Promise.all(
+                        commentUser.map(async(v) => {
+                            const get1 = await getDoc(doc(useFirestore,'account',v));
+                            const get2 = get1.data();
+                            return({
+                                uid : v,
+                                name : get2.general.name,
+                                id : get2.general.id,
+                                photoURL : get2.general.photoURL
+                            })
+                        })
+                    )
+                    commentUserArr = [...userData1];
+                }
+                // 게시글 그룹 정보
+                let groupObj = {}
+                const group = postData.group;
+                if(group){
+                    const groupInfo = await getDoc(doc(useFirestore,'groups',group))
+                    const groupData = groupInfo.data()
+                        groupObj.title = groupData.title;
+                        groupObj.photoURL = groupData.photoURL;
+                        groupObj.id = group
+                }
+                // 이미지 배열 정리
+                const mediaArr = Object.entries({...postData}).filter(v => v[0].split('_')[0] === 'media')
+                const mediaArr2 = mediaArr.map(v => v[1]);
+
+                const dataObj = {...postData,
+                    media : [...mediaArr2],
+                    user_name : data2.general.name, 
+                    user_id : data2.general.id , 
+                    user_photo : data2.general.photoURL, 
+                    userInfo : commentUserArr, 
+                    postID : v.id,
+                    group : {...groupObj}
+                };
+                return [v.id, dataObj]
+            }))
+            setpostFeed(state => docArr2)
+            setfeedLoading(false)
         })
         return () => unsub();
     },[])
 
-    useEffect(function(){   // 피드 게시물 로딩
-        console.log("[postID changed]",postIds)
-        if( !postIds.length ){
-            setfeedLoading(false)
-        } else {
-            postIds.forEach((v,i) => {
-                const db = doc(useFirestore,'posts', v)
-                const unsub = onSnapshot(db, async(postDoc) => {
-                    const postData = postDoc.data();
-                    const myBlock = store.getState().setCurrentUser.block;
+    // useEffect(function(){   // 피드 게시물 로딩
+    //     if( !postIds.length ){
+    //         setfeedLoading(false)
+    //     } else {
+    //         postIds.forEach((v,i) => {
+    //             const db = doc(useFirestore,'posts', v)
+    //             const unsub = onSnapshot(db, async(postDoc) => {
+    //                 const postData = postDoc.data();
+    //                 const myBlock = store.getState().setCurrentUser.block;
     
-                    if(!myBlock.some(v => v === postData.uid)){
-                        // 작성자 정보
-                        const userDb = await getDoc(doc(useFirestore,'account',postData.uid))
-                        const data2 = userDb.data();
+    //                 if(!myBlock.some(v => v === postData.uid)){
+    //                     // 작성자 정보
+    //                     const userDb = await getDoc(doc(useFirestore,'account',postData.uid))
+    //                     const data2 = userDb.data();
                         
-                        // 댓글 정보
-                        let commentUserArr = [];
-                        if(postData.comment.length !== 0){
-                            const comments = postData.comment.map(v => v.uid);
-                            const commentUser = [...new Set(comments)]
-                            const userData1 = await Promise.all(
-                                commentUser.map(async(v) => {
-                                    const get1 = await getDoc(doc(useFirestore,'account',v));
-                                    const get2 = get1.data();
-                                    return({
-                                        uid : v,
-                                        name : get2.general.name,
-                                        id : get2.general.id,
-                                        photoURL : get2.general.photoURL
-                                    })
-                                })
-                            )
-                            commentUserArr = [...userData1];
-                        }
-                        // 게시글 그룹 정보
-                        let groupObj = {}
-                        const group = postData.group;
-                        if(group){
-                            const groupInfo = await getDoc(doc(useFirestore,'groups',group))
-                            const groupData = groupInfo.data()
-                                groupObj.title = groupData.title;
-                                groupObj.photoURL = groupData.photoURL;
-                                groupObj.id = group
-                        }
-                        // 이미지 배열 정리
-                        const mediaArr = Object.entries({...postData}).filter(v => v[0].split('_')[0] === 'media')
-                        const mediaArr2 = mediaArr.map(v => v[1]);
+    //                     // 댓글 정보
+    //                     let commentUserArr = [];
+    //                     if(postData.comment.length !== 0){
+    //                         const comments = postData.comment.map(v => v.uid);
+    //                         const commentUser = [...new Set(comments)]
+    //                         const userData1 = await Promise.all(
+    //                             commentUser.map(async(v) => {
+    //                                 const get1 = await getDoc(doc(useFirestore,'account',v));
+    //                                 const get2 = get1.data();
+    //                                 return({
+    //                                     uid : v,
+    //                                     name : get2.general.name,
+    //                                     id : get2.general.id,
+    //                                     photoURL : get2.general.photoURL
+    //                                 })
+    //                             })
+    //                         )
+    //                         commentUserArr = [...userData1];
+    //                     }
+    //                     // 게시글 그룹 정보
+    //                     let groupObj = {}
+    //                     const group = postData.group;
+    //                     if(group){
+    //                         const groupInfo = await getDoc(doc(useFirestore,'groups',group))
+    //                         const groupData = groupInfo.data()
+    //                             groupObj.title = groupData.title;
+    //                             groupObj.photoURL = groupData.photoURL;
+    //                             groupObj.id = group
+    //                     }
+    //                     // 이미지 배열 정리
+    //                     const mediaArr = Object.entries({...postData}).filter(v => v[0].split('_')[0] === 'media')
+    //                     const mediaArr2 = mediaArr.map(v => v[1]);
 
-                        const dataObj = {...postData,
-                            media : [...mediaArr2],
-                            user_name : data2.general.name, 
-                            user_id : data2.general.id , 
-                            user_photo : data2.general.photoURL, 
-                            // time : timeObj, 
-                            userInfo : commentUserArr, 
-                            postID : postDoc.id,
-                            group : {...groupObj}
-                        };
-                        setpostFeed(state => ({...state, [postDoc.id] : dataObj}))
-                        setfeedLoading(false)
-                    }
-                })
-            })
-        }
+    //                     const dataObj = {...postData,
+    //                         media : [...mediaArr2],
+    //                         user_name : data2.general.name, 
+    //                         user_id : data2.general.id , 
+    //                         user_photo : data2.general.photoURL, 
+    //                         // time : timeObj, 
+    //                         userInfo : commentUserArr, 
+    //                         postID : postDoc.id,
+    //                         group : {...groupObj}
+    //                     };
+    //                     setpostFeed(state => ({...state, [postDoc.id] : dataObj}))
+    //                     setfeedLoading(false)
+    //                 }
+    //             })
+    //         })
+    //     }
 
-    },[postIds])
+    // },[postIds])
 
    
 
@@ -141,23 +211,6 @@ export default function Home(){
         })        
     }
 
-    const deletePost = async function(postID){  // 게시물 삭제 //
-        const postDB = doc(useFirestore,'posts',postID)
-        const likeQuery = query(collection(useFirestore,'account'),where('like','array-contains',postID))
-
-        await getDocs(likeQuery, (snapshot) => {
-            snapshot.docs.forEach(v => {
-                const userUid = v.id;
-                const data = v.data();
-                const userDB = doc(useFirestore,'account',userUid);
-                updateDoc(userDB,{
-                    like : data.like.filter(val => val !== postID)
-                })
-            })
-        })
-        await deleteDoc(postDB);
-
-    }
 
     // 이미지 업로드 //
     const postImage = async function(event){
@@ -219,15 +272,7 @@ export default function Home(){
     //         }
     //     }
     // },[])
-    const checkRadio = function(e){
-        const q = e.target;
-        console.log(q.getAttribute('checked'))
-        if(q.getAttribute('checked')){
-            q.classList.add("qqq")
-        } else {
-            q.classList.remove("qqq")
-        }
-    }
+   
 // components ================================================= //
    
 
@@ -315,7 +360,7 @@ export default function Home(){
                                         <li
                                         // onClick={(e) => {selectGroup.current.value = ""; showGroup.current.value = "그룹 없음"}}
                                         >
-                                            <input type="radio" name="group" value=""  id="radio_default" hidden={false} checked={true}/>
+                                            <input type="radio" name="group" value=""  id="radio_default" hidden={false} defaultChecked={true}/>
                                             <label htmlFor="radio_default">그룹 없음</label>
                                         </li>
                                         {Object.entries(store.getState().setCurrentUser.group).map(v => 
@@ -354,10 +399,12 @@ export default function Home(){
                     </div>
                     <div className="h_feed">
                         <ul>
-                            {!Object.entries(postFeed).length? (
+                            {/* {!Object.entries(postFeed).length? ( */}
+                            {!postFeed.length? (
                                 <div>텅텅.....</div>
                             ) : (
-                                Object.entries(postFeed).sort((a,b) => a[1].time - b[1].time).reverse().map((v,i) => {
+                                // Object.entries(postFeed).sort((a,b) => a[1].time - b[1].time).reverse().map((v,i) => {
+                                postFeed.sort((a,b) => a[1].time - b[1].time).reverse().map((v,i) => {
                                     return(   
                                         < HomeUnitPostComponent postData={v[1]} postID={v[0]} key={`post_${v[0]}`}/>
                                 )})

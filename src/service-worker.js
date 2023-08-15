@@ -7,11 +7,11 @@ self.addEventListener('install', function(e){
     )
 })
 
-// self.addEventListener('fetch', function(e){
-//     if( e.request.method != "POST"){
-//         e.respondWith(handleRequest(e.request))    
-//     }
-// })
+self.addEventListener('fetch', function(e){
+    if( e.request.method != "POST"){
+        e.respondWith(handleRequest(e.request))    
+    }
+})
 
 const handleRequest = async function(req){
         const cache = await caches.open('snsCache');
@@ -23,3 +23,4 @@ const handleRequest = async function(req){
         cache.put(req, networkRes.clone());
         return networkRes;
 }
+

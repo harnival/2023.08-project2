@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import '../css/group.css'
-import { BrowserRouter as Router, Routes, Link, Route, useParams, useNavigate } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Link, Route, useParams, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth, useFirestore } from '../datasource/firebase'
 import { addDoc, arrayUnion, collection, doc,getDoc, getDocs, onSnapshot, query, updateDoc, where} from 'firebase/firestore';
 import store from '../store/store';
@@ -12,6 +12,8 @@ export default function Group(){
     const uid = useAuth.currentUser.uid
     const [callGroup, setcallGroup] = useState([]);
     const [limitDesc, setlimitDesc] = useState()
+    const [searchList, setsearchList] = useState([]);
+    const [recomGroup, setrecomGroup] = useState([]);
 
     useEffect(function(){   //그룹 게시물 변화 감시
        
@@ -29,7 +31,33 @@ export default function Group(){
         }
         callFirst()
     },[])
-
+    useEffect(function(){
+        async function recomm(){
+            const groups = Object.entries(store.getState().setCurrentUser.group);
+            const groupLen = groups.length;
+            const chooseGroup = Math.floor(Math.random()*groupLen);
+            const userList =await  getDoc(doc(useFirestore,'groups',groups[chooseGroup][0]))
+            const userListData = userList.data().user;
+            setrecomGroup(state => state[0] = groups[chooseGroup])
+            
+            const total = {};
+            await Promise.all(userListData.map(v => {
+                getDoc(useFirestore,'account',v)
+                .then(snapshot => Object.keys(snapshot.data().group))
+                .then(data => {
+                    data.forEach(v => total[v] = (total[v]||0)+1)
+                })
+            }))
+            await Promise.all(Object.entries(total).sort((a,b) => a[1] - b[1]).map((v,i) => {
+                if(i < 10){
+                    getDoc(doc(useFirestore,'groups',v[0]))
+                    .then(snapshot => snapshot.data())
+                    .then(data => setrecomGroup(state => state[1] = [...state[1], data]))
+                }
+            }))
+        }
+        recomm()
+    },[])
     // 그룹 생성 //
     const [selectAvatar, setselectAvatar] = useState()
     let imageFileReader = useRef();
@@ -80,7 +108,7 @@ export default function Group(){
             }
         }
     }
-    const goToUnit =async function(id){
+    const goToUnit =async function(id){     // 그룹 페이지로 이동
         const storeData = store.getState().setGetGroup[id];
         if(!storeData){
             const db = doc(useFirestore,'groups',id);
@@ -97,7 +125,32 @@ export default function Group(){
             return navigate(`${id}`,{state : {data : data3}})
         }
     }
-    function GroupMain(){
+    const searchGroup = async function(e){
+        e.preventDefault()
+        const q = e.target;
+        const w = new FormData(q);
+        const data = Object.fromEntries(w.entries());
+        const keyword = data.search;
+        setsearchList(state => [])
+
+        const groupQuery = query(collection(useFirestore,'groups'), where('title','>=',keyword))
+        const groupQuery2 = query(collection(useFirestore,'groups'), where('description','>=',`#${keyword}`))
+        const groupQuery3 = query(collection(useFirestore,'groups'), where('description','>=',keyword))
+        const data1 = await getDocs(groupQuery);
+            const data1_2 =await Promise.all( data1.docs.map(v => [v.id, v.data()]))
+            setsearchList(state => [...data1_2])
+        const data2 = await getDocs(groupQuery2);
+            const data2_2 =await Promise.all( data2.docs.map(v => [v.id, v.data()]))
+            setsearchList(state => [...state, ...data2_2])
+        const data3 = await getDocs(groupQuery3);
+            const data3_2 =await Promise.all( data3.docs.map(v => [v.id, v.data()]))
+            setsearchList(state => [...state, ...data3_2])
+        return navigate(`/group/search/q/${keyword}`, {state : {data : searchList}});
+    }
+
+
+    // ======================================================================================================================
+    function GroupMain(){   // 그룹 메인 페이지 component
         return(
             <div className="g_b_main">
                 <div className="g_b_my">
@@ -120,39 +173,59 @@ export default function Group(){
                         ))}
                     </ul>
                 </div>
-                {/* <div className="g_b_popular">
+                <div className="g_b_popular">
                     <h3>추천 그룹</h3>
-                    <p>@@@ 그룹의 유저들이 참여한 그룹입니다.</p>
+                    <p>{recomGroup[0]&&recomGroup[0][1]} 그룹의 유저들이 참여한 그룹입니다.</p>
                     <ul>
-                    {new Array(10).fill().map(v => (
-                        <li className='g_b_my_list'>
-                            <div className="g_b_my_img">
-                                <img src="" alt="" />
-                                <div className="g_b_my_alarm"></div>
-                            </div>
-                            <div className="g_b_my_text">
-                                <p>sample title</p>
-                                <p>sample sub</p>
-                                <p>000명 참여</p>
-                            </div>
-                        </li>
-                        ))}
+                    
                     </ul>
-                </div> */}
+                </div>
 
             </div>
         )
     }
 
+    function GroupSearchComponent(){
+        const location = useLocation();
+        const {keyword} = useParams()
+        const groupData = location.state.data;
+
+        return(
+            <div className="g_b_searchResult">
+                <div className="g_b_sr_text">
+                    <button type='button' onClick={() => navigate('/group')}>뒤로 가기</button>
+                    <p>검색 결과 : {keyword}</p>
+                </div>
+                <div className="g_b_sr_list">
+                    <ul>
+                        {groupData.length === 0 && (
+                            <li className='g_b_sr_empty'>검색 결과가 없습니다.</li>
+                        )}
+                        {groupData.map(v => (
+                            <li>
+                                <img src={v.photoURL} />
+                                <div className="g_b_sr_list_text">
+                                    <p>{v.title}</p>
+                                    <p>{v.description}</p>
+                                    <p>{v.user&&v.user.length}</p>
+                                </div>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            </div>
+        )
+    }
+// =============================================================================================
     return(
         <div id="group">
             <div className="groupBox">
                 <div className="g_search">
-                    <div className="g_s_inputBox">
+                    <form className="g_s_inputBox" id='groupSearch' onSubmit={(e) => searchGroup(e)}>
                         <input type="text" name='search' placeholder='검색어를 입력하세요.'/>
-                    </div>
+                    </form>
                     <div className="g_s_btn g_s_btn1">
-                        <button>검색</button>
+                        <button form='groupSearch'>검색</button>
                     </div>
                     <div className="g_s_btn g_s_btn2">
                         <button onClick={() => toggleNew()}>그룹 생성</button>
@@ -190,6 +263,7 @@ export default function Group(){
                     <Routes>
                         <Route path='/' element={<GroupMain />}></Route>
                         <Route path=':groupID' element={<GroupUnit />}></Route>
+                        <Route path='search/q/:keyword' element={<GroupSearchComponent />}></Route>
                     </Routes>
                 </div>
             </div>

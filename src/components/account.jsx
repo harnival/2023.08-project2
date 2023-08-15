@@ -5,7 +5,6 @@ import { useAuth, useFirestore } from '../datasource/firebase';
 import { useParams, useNavigate } from 'react-router-dom';
 import store from '../store/store';
 
-import PostComponent from './post';
 
 export default function Account(props){
 
@@ -16,11 +15,13 @@ export default function Account(props){
         photoURL : null,
         id : null,
         uid : userID,
+        follower: []
     })
     const [openUserMenu, setopenUserMenu] = useState(false) // 유저 메뉴 온오프
     const [userPage, setuserPage] = useState(0)     // 유저 페이지 - 0 : 피드 , 1 : 그룹 , 2 : 좋아요
     const [callPost, setcallPost] = useState([])    // 게시물 불러오기
     const [groupList, setgroupList] = useState([])  // 그룹 리스트 불러오기
+    const [likePost, setlikePost] = useState([])    // 좋아요 누른 게시물 불러오기
 
     useEffect(function(){   // 게시물 미디어 슬라이드 //
          if(callPost){
@@ -74,7 +75,8 @@ export default function Account(props){
                     id : data.general.id,
                     uid : userID,
                     group : data.group,
-                    like : data.like    
+                    like : data.like,
+                    follower: data.follower
                 }))
             } else {
                 console.log("ddddddd")
@@ -91,18 +93,11 @@ export default function Account(props){
             hour : new Date(time).getHours() <10? "0"+new Date(time).getHours() : new Date(time).getHours(),
             minute : new Date(time).getMinutes() <10? "0"+new Date(time).getMinutes() : new Date(time).getMinutes(),
         }
-        return `${timeObj.year}년 ${timeObj.month}월 ${timeObj.date}일 ${timeObj.hour}시 ${timeObj.minute}분`
+        return `${timeObj.year}/${timeObj.month}/${timeObj.date} ${timeObj.hour}:${timeObj.minute}`
     }
 
-    useEffect(function(){   // 게시물 로드
-        const q = query(collection(useFirestore,'posts'),where('uid','==',userID));
-        const data1 = onSnapshot(q, async(snapshotDoc) => {
-            const dataArr = await Promise.all(
-                snapshotDoc.docs.map(async(v) => {
-                    const postData = v.data();
-                    
-                    // 댓글 목록
-                    let commentUserArr = [];
+    const loadPost =async function(v,postData){
+        let commentUserArr = [];
                     if(postData.comment.length !== 0){
                         const comments = postData.comment.map(v => v.uid);
                         const commentUser = [...new Set(comments)]
@@ -145,7 +140,15 @@ export default function Account(props){
                         group : {...groupObj}
                     };
                     return ([v.id, dataObj]);
-    
+    }
+
+    useEffect(function(){   // 게시물 로드
+        const q = query(collection(useFirestore,'posts'),where('uid','==',userID));
+        const data1 = onSnapshot(q, async(snapshotDoc) => {
+            const dataArr = await Promise.all(
+                snapshotDoc.docs.map(async(v) => {
+                    const postData = v.data();
+                    return loadPost(v,postData)
                 })
             )
             const dataArr2 = [...dataArr].sort((a,b) => a[1].time - b[1].time)
@@ -170,6 +173,74 @@ export default function Account(props){
             groupLoad()
         }
     },[userInfo])
+    useEffect(function(){   // 좋아요 누른 게시물 불러오기
+        const db = collection(useFirestore, 'posts')
+        const likeQuery = query(db, where('like','array-contains',userID))        
+        const queryFunc = async function(){
+            const data1 = await getDocs(likeQuery);
+            const data2 = data1.docs;
+            const data3 = await Promise.all(
+                data2.map(async(v) => {
+                    const postData = v.data();
+
+                    const uid = v.data().uid;
+                    const userdb = doc(useFirestore,'account',uid);
+                    const user1 = await getDoc(userdb)
+                    const user2 = user1.data();
+                    console.log(user2)
+
+
+                    let commentUserArr = [];
+                    if(postData.comment.length !== 0){
+                        const comments = postData.comment.map(v => v.uid);
+                        const commentUser = [...new Set(comments)]
+                        const userData1 = await Promise.all(
+                            commentUser.map(async(v) => {
+                                const get1 = await getDoc(doc(useFirestore,'account',v));
+                                const get2 = get1.data();
+                                return({
+                                    uid : v,
+                                    name : get2.general.name,
+                                    id : get2.general.id,
+                                    photoURL : get2.general.photoURL
+                                })
+                            })
+                        )
+                        commentUserArr = [...userData1];
+                    }
+                    // 게시글 그룹 정보
+                    let groupObj = {}
+                    const group = postData.group;
+                    if(group){
+                        const groupInfo = await getDoc(doc(useFirestore,'groups',group))
+                        const groupData = groupInfo.data()
+                            groupObj.title = groupData.title;
+                            groupObj.photoURL = groupData.photoURL;
+                            groupObj.id = group
+                    }
+                    // 이미지 배열 정리
+                    const mediaArr = Object.entries({...postData}).filter(v => v[0].split('_')[0] === 'media')
+                    const mediaArr2 = mediaArr.map(v => v[1]);
+
+
+                    const dataObj = {...postData,
+                        media : [...mediaArr2],
+                        user_name : user2.general.name, 
+                        user_id : user2.general.id , 
+                        user_photo : user2.general.photoURL, 
+                        userInfo : commentUserArr, 
+                        postID : v.id,
+                        group : {...groupObj}
+                    };
+                    return ([v.id, dataObj]);
+                })
+            )
+            setlikePost(state => data3);
+        }
+        queryFunc();
+
+    },[userID])
+
     const sendMessage = function(){
         if(userID !== useAuth.currentUser.uid){
             const q = query(collection(useFirestore,'messages'),where('user','in', [[userID, useAuth.currentUser.uid],[useAuth.currentUser.uid, userID]]));
@@ -247,7 +318,18 @@ export default function Account(props){
         })
         await deleteDoc(postDB);
     }
-    
+    const followUser = function(user){
+        const db = doc(useFirestore,'account',user);
+        updateDoc(db, {
+            follower : arrayUnion(useAuth.currentUser.uid)
+        })
+    }
+    const cancelFollowUser = function(user){
+        const db = doc(useFirestore,'account',user);
+        updateDoc(db, {
+            follower : arrayRemove(useAuth.currentUser.uid)
+        })
+    }
 //  components ============================================================== //
     const PostComponent = memo(function({data, idx}){
         const postID = data[0];
@@ -364,9 +446,11 @@ export default function Account(props){
                                             <img src={v.userInfo.find(v => v.uid === val.uid).photoURL} />
                                         </div>
                                         <div className="acc_f_com_u_name">@{v.userInfo.find(v => v.uid === val.uid).id}</div>
+                                    </div>
+                                    <div className="acc_f_com_u_text">
+                                        {val.text}
                                         <div className="acc_f_com_u_time">{changeTime(val.time)}</div>
                                     </div>
-                                    <div className="acc_f_com_u_text">{val.text}</div>
                                 </li>
                             ))
                         ) : (
@@ -434,7 +518,8 @@ export default function Account(props){
                         <div className="acc_i_a_name">
                             <p className="acc_i_a_n_name">{userInfo.name}</p>
                             <p className="acc_i_a_n_id">@{userInfo.id}</p>
-                            <p className="acc_i_a_n_follow"></p>
+                            <p className='acc_i_a_n_desc'>{userInfo.description}</p>
+                            <p className="acc_i_a_n_follow">팔로워 <strong>{userInfo.follower? userInfo.follower.length : 0}</strong></p>
                                 {userID !== useAuth.currentUser.uid?(
                                     <div className="acc_i_a_btn1">
                                         <button type="button" onClick={() => setopenUserMenu(state => !state)}>사용자 메뉴</button>
@@ -448,14 +533,23 @@ export default function Account(props){
                                         )}
                                     </div>) : (
                                        <div className="acc_i_a_btn2">
-                                            <button>프로필 수정</button>
+                                            <button type='button' onClick={() => setopenUserMenu(state => !state)}>프로필 수정</button>
+                                            {openUserMenu && (
+                                            <ul className="acc_i_a_b_menu">
+                                                <li><a href='/#' onClick={(e) => e.preventDefault()}>edit profile</a></li>
+                                                <li><a href='/#' onClick={(e) => e.preventDefault()}>logout</a></li>
+                                            </ul>
+                                        )}
                                        </div>
                                     )}
                         </div>
                         {userID !== useAuth.currentUser.uid? (
                             <div className="acc_i_followBtn">
-                                <a href="/#">follow</a>
-                                <a href="/#">cancel follow</a>
+                                {userInfo.follower && userInfo.follower.includes(useAuth.currentUser.uid)? (
+                                    <a href="/#" className='acc_i_f_cancel'>cancel follow</a>
+                                ):(
+                                    <a href="/#" className='acc_i_f_follow' onClick={(e) => {e.preventDefault(); followUser(userID)}}>follow</a>
+                                )}
                             </div>
                         ) : null }
                         <div className="acc_i_pageMenu">
@@ -491,7 +585,14 @@ export default function Account(props){
                         </div>
                     ) : userPage === 2 ? (
                         <div className='acc_like'>
-
+                            <div className="acc_like_section1">
+                                <h3>관심 등록한 포스팅</h3>
+                                <ul>
+                                    {likePost.map((v,i) => (
+                                        <PostComponent data={v} idx={i} key={`likePost_${v[0]}`} />
+                                    ))}
+                                </ul>
+                            </div>
                         </div>
                     ) : null
                     }

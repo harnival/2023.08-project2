@@ -9,9 +9,10 @@
 
 .acc_info {
     width: 30%;
-    background-color: tomato;
-    padding-left: 5%;
+    background: linear-gradient(to bottom, rgb(28, 167, 125),royalblue);
+    padding: 0 3%;
     box-sizing: border-box;
+    border-top-right-radius: 2rem;
 }
 .acc_i_account {
     position: sticky;
@@ -38,11 +39,15 @@
 .acc_i_a_n_name {
     font-size: 150%;
     font-weight: bold;
+    word-wrap: break-word;
 }
 .acc_i_a_n_id {
     font-size: 100%;
     color: rgb(0,0,0,0.7);
     padding-left: 1em;
+}
+.acc_i_a_n_follow{
+    padding: 0.5rem 1rem;
 }
 .acc_i_a_btn1,
 .acc_i_a_btn2 {
@@ -85,6 +90,57 @@
 .acc_i_a_b_menu li a:hover {
     background-color: #aaa;
 }
+.acc_i_followBtn a{
+    display: block;
+    padding: 0.3rem;
+    border-radius: 0.5rem;
+    color: white;
+    text-align: center;
+}
+.acc_i_f_cancel {
+    background-color: rgb(126, 50, 126);
+}
+.acc_i_f_follow {
+    background-color: royalblue;
+}
+.acc_i_pageMenu{
+    padding: 2rem 0;
+}
+.acc_i_pageMenu ul {
+    display: flex;
+    flex-direction: column;
+    align-items: end;
+    width: 100%;
+}
+.acc_i_pageMenu li {
+    width: 80%;
+    text-align: end;
+    position: relative;
+}
+.acc_i_pageMenu button {
+    border: 0;
+    height: 3em;
+    font-size: 120%;
+    width: 100%;
+    cursor: pointer;
+    background-color: transparent;
+    text-align: end;
+    padding-right: 1em;
+}
+.acc_i_pageMenu li::after {
+    content: "";
+    display: block;
+    width: 100%;
+    position: absolute;
+    bottom: 0px;
+    left: 0;
+    height: 1px;
+    background: linear-gradient(to right, transparent, black);
+}
+.acc_i_pageMenu button:hover {
+    background: linear-gradient(to right, transparent,rgb(28, 167, 125));
+}
+
 /* ------------------------------------------ */
 .acc_feed {
     width: 70%;
@@ -334,6 +390,7 @@
 .acc_f_com_u_account {
     height: 3rem;
     display: flex;
+    gap: 0.5rem;
     align-items: center;
     position: relative;
 }
@@ -358,9 +415,10 @@
     right: 0;
 }
 .acc_f_com_u_text{
-    width: 90%;
-    margin: auto;
-    padding: 0.5rem 0;
+    width: 100%;
+    padding: 0.5rem 2rem;
+    position: relative;
+    box-sizing: border-box;
 }
 .acc_f_com_input {
     height: 3rem;
@@ -396,6 +454,16 @@
 .acc_group_section1 ul{
     display: flex;
     flex-wrap: wrap;
+    width: 90%;
+    margin: auto;
+    padding: 2em 0;
+}
+.acc_group_section1 h3 {
+    width: 100%;
+    padding: 2em 5%;
+    box-sizing: border-box;
+    background-color: rgb(28, 167, 125);
+    border-top-left-radius: 2rem;
 }
 .acc_group_unit{
     width: calc(100% / 3);
@@ -424,7 +492,7 @@
     width: 100%;
     bottom: 0;
     left: 0;
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 20%, transparent);
+    background: linear-gradient(to top, rgba(0,0,0, 0.8) 20%, transparent);
     display: flex;
     flex-direction: column;
     justify-content: end;
@@ -447,4 +515,12 @@
     color: #aaa;
     font-size: 90%;
     padding-left: 1rem;
+}
+/* ============================================= */
+.acc_like_section1 h3 {
+    width: 100%;
+    padding: 2em 5%;
+    box-sizing: border-box;
+    background-color: rgb(212, 146, 3);
+    border-top-left-radius: 2rem;
 }
