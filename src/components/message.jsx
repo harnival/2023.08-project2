@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import '../css/message.css';
+import '../css/message_1023.css'
 import MessageUnit from './messageUnit';
 
 import { Routes, Route, Link, useNavigate, Outlet, useLocation } from 'react-router-dom';
 import { collection, doc, getDoc, getDocs, onSnapshot, query, where } from 'firebase/firestore';
 import { useAuth, useFirestore } from '../datasource/firebase';
 import store from '../store/store';
+import { useSelector } from 'react-redux';
 
 
 export default function Message(){
@@ -48,6 +50,7 @@ export default function Message(){
                 })
             )
             setcallList(state => ([...dataArr1]))
+            setnowList(state => ([...dataArr1]))
         })
         return () => unsub()
     },[])
@@ -74,22 +77,31 @@ export default function Message(){
     },[nowList])
 
     const goToMessage = function(id){
-        // const msgObj = callList.find(v => v.pageID === id);
         setnowPageID(state => id)
     }
 
+
+    const location = useLocation();
+    const msgBoxRef = useRef();
+
     useEffect(function(){
         if(nowPageID){
-            const id = nowPageID;
-            navigate(`${id}`, { state : {data : callList.find(v => v.pageID === id)}})
+            navigate(`${nowPageID}`)
+            msgBoxRef.current.style.left = '-100vw'
         }
     },[nowPageID])
-    const location = useLocation();
+
     useEffect(function(){
-        if( location.pathname.includes('/message/') && nowPageID !== location.pathname.split('/message/')[1]){
-            setnowPageID(state => location.pathname.split('/message/')[1])            
+        if( location.pathname.includes('/message') && nowPageID !== location.pathname.split('/message/')[1]){
+            const pathID = location.pathname.split('/message/');
+            console.log(pathID)
+            if( pathID[0] === '/message'){
+                msgBoxRef.current.style.left = '0'
+                setnowPageID(state => null)
+            } 
         }
-    },[location])
+        console.log(location.pathname, nowPageID)
+    },[location.pathname])
 
     const [category, setcategory] = useState()
     useEffect(function(){
@@ -132,10 +144,10 @@ export default function Message(){
             }
         }
 
-     },[])
+     },[])    
     return(
         <div id="message">
-            <div className="messageBox">
+            <div className="messageBox"  ref={msgBoxRef}>
                 <div className="m_list">
                     <div className="m_l_category">
                         <ul>
@@ -157,7 +169,7 @@ export default function Message(){
                                                 <img src={v.group.photoURL}/>
                                             </div>
                                             <div className="m_l_g_title">
-                                                # {v.group.title}
+                                                <strong># {v.group.title} </strong> Group Chat
                                             </div>
                                         </div>
                                     )}

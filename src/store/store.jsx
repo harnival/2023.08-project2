@@ -8,6 +8,7 @@ const states = {
     currentSelectGroup : null,
     selectGroupData : {},
     pageLoadDone : true,
+    message1023On : false
 }
 
 // dispatch function ====================================================================== //
@@ -32,10 +33,16 @@ const setSelectGroupData = function(state = states.selectGroupData, action){
 const setGetGroup = function(state = states.selectGroupData){
     return state
 }
+const setMessage1023On = function(state = states.message1023On, action){
+    if(action.type === 'setMessage1023On' && window.innerWidth <= 1023){
+        state = action.value
+    }
+    return state
+}
 
 // =================================================================================
 const reducers = combineReducers({
-    setCurrentUser, setSelectGroupData, setGetGroup
+    setCurrentUser, setSelectGroupData, setGetGroup, setMessage1023On
 })
 const store = createStore(reducers);
 export default store;

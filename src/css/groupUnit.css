@@ -1,5 +1,5 @@
 .gu_info {
-    background-color: tomato;
+    background: linear-gradient(to right, rgb(28, 167, 125),transparent), linear-gradient(to top, transparent, rgb(170, 77, 170)), linear-gradient(to top, rgb(175, 53, 31), transparent);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -111,4 +111,122 @@
 }
 .gu_i_o_list button:hover {
     background-color: rgb(0,0,0,0.2);
+}
+
+/* ====================================================================== */
+@media screen and (max-width : 1023px){
+    .gu_info {
+        background: linear-gradient(to right, rgb(28, 167, 125),transparent), linear-gradient(to top, transparent, rgb(170, 77, 170)), linear-gradient(to top, rgb(175, 53, 31), transparent);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        position: relative;
+        border-bottom-left-radius: 2rem;
+        border-bottom-right-radius: 2rem;
+        padding: 1rem 0;
+    }
+    .gu_i_image {
+        height: max(8rem, 15vh);
+        aspect-ratio: 1/1;
+        border: 1px solid black;
+        border-radius: 20%;
+        overflow: hidden;
+        background-color: white;
+    }
+    .gu_i_image img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        object-position: center;
+    }
+    .gu_i_title {
+        font-size: 150%;
+    }
+    .gu_i_btn {
+        position: absolute;
+        top: 0;
+        left: 0;
+        padding: 1rem;
+    }
+    .gu_i_btn button {
+        border: 0;
+        font-size: 0px;
+        width: 2rem;
+        height: 2rem;
+        padding: 0.5rem;
+        background: url('../img/keyboard-backspace.svg') no-repeat center /contain;
+        cursor: pointer;
+        transform-origin: center;
+        transition: .3s ease;
+        border-radius: 20%;
+    }
+    .gu_i_btn button:hover {
+        transform: scale(1.2,1.2);
+        background-color: white;
+    }
+    
+    .gu_tab_box {
+        width: 80%;
+        /* border: 1px solid black; */
+        box-sizing: border-box;
+        margin: auto;
+        display: flex;
+    }
+    .gu_tab button {
+        flex: 1;
+        width: 100%;
+        height: 2rem;
+        border: 0;
+        background-color: white;
+        cursor: pointer;
+    }
+    .gu_tab button:hover{
+        background-color: #ccc;
+    }
+    .gu_tab_line{
+        width: 1px;
+        height: 2rem;    
+        background: linear-gradient(to top, transparent, black,transparent);
+    }
+    .gu_i_option {
+        position: absolute;
+        top: 0;
+        right: 0;
+        padding: 1rem;
+    }
+    .gu_i_option > button {
+        width: 2rem;
+        height: 2rem;
+        font-size: 0;
+        background: url('../img/dots-vertical.svg') no-repeat center / 100%;
+        cursor: pointer;
+        border: 0;
+        border-radius: 20%;
+        transition: .3s ease;
+    }
+    .gu_i_option > button:hover {
+        background-color: white;
+        transform: scale(1.2,1.2);
+    }
+    .gu_i_o_list {
+        position: absolute;
+        top: 50%;
+        right: 100%;
+        word-break: keep-all;
+        white-space: nowrap;
+        background-color: white;
+        box-shadow: 1px 2px 5px 0px rgba(0, 0, 0, 0.6);
+    }
+    .gu_i_o_list button {
+        display: block;
+        border: 0;
+        width: 100%;
+        padding: 0.5rem;
+        cursor: pointer;
+        transition: .3s ease;
+    }
+    .gu_i_o_list button:hover {
+        background-color: rgb(0,0,0,0.2);
+    }
 }

@@ -9,25 +9,29 @@
     }
     
     .acc_info {
-        height: 30vh;
         position: sticky;
         top: 0;
         z-index: 8000;
+        overflow: hidden;
         /* ---------------------------- */
         width: 100%;
         background: linear-gradient(to bottom, rgb(28, 167, 125),royalblue);
-        padding:2rem 2rem 0;
+        padding:0;
         box-sizing: border-box;
         border-top-right-radius: 0;
-        border-bottom-right-radius: 2rem;
+        border-bottom-right-radius: 1.5rem;
     }
     .acc_i_account {
         height: 100%;
-        display: flex;
-        gap: 1rem;
         /* --------------------------- */
         position: relative;
         top: 0vh;
+    }
+    .acc_i_account_box {
+        display: flex;
+        padding:2rem ;
+        gap: 1rem;
+        box-sizing: border-box;
     }
     .acc_i_a_name {
         flex: 1;
@@ -43,7 +47,7 @@
         object-position: center;
     }
     .acc_i_a_avatar {
-        height: 40%;
+        height: 10vh;
         /* ------------------------------ */
         width: auto;
         aspect-ratio: 1/1;
@@ -120,18 +124,17 @@
         background-color: royalblue;
     }
     .acc_i_pageMenu{
-        position: absolute;
-        bottom: 0;
-        left: 0;
         width: 100%;
         /* ------------------------------------ */
         padding: 0;
     }
     .acc_i_pageMenu ul {
+        /* --------------- */
         display: flex;
         flex-direction: row;
         align-items: center;
-        width: 100%;
+        width: 80%;
+        margin: auto;
     }
     .acc_i_pageMenu li {
         flex: 1;
@@ -151,13 +154,15 @@
         padding-right: 1em;
     }
     .acc_i_pageMenu li::after {
+        right: 0;
+        /* ---------------------------- */
         content: "";
         display: block;
-        width: 100%;
+        width: 1px;
         position: absolute;
         bottom: 0px;
-        left: 0;
-        height: 1px;
+        left: auto;
+        height: 100%;
         background: linear-gradient(to right, transparent, black);
     }
     .acc_i_pageMenu button:hover {
@@ -166,9 +171,12 @@
     
     /* ------------------------------------------ */
     .acc_feed {
-        width: 70%;
+        width: 100%;
     }
     .acc_posts {
+        width: 90%;
+        margin: auto;
+        /* -------------------------- */
         display: flex;
         flex-direction: column;
         gap: 3rem;
@@ -477,9 +485,9 @@
     .acc_group_section1 ul{
         display: flex;
         flex-wrap: wrap;
-        width: 90%;
+        width: 100%;
         margin: auto;
-        padding: 2em 0;
+        padding:0;
     }
     .acc_group_section1 h3 {
         width: 100%;

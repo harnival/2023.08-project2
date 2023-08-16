@@ -17,6 +17,7 @@
     margin: auto;
     display: flex;
     height: 100vh;
+    transition: .3s ease;
 }
 .m_list {
     width: 30%;
@@ -50,6 +51,9 @@
     border-radius: 1em;
 
 }
+.m_l_list {
+    padding-top: 1rem;
+}
 .m_l_box {
     position: relative;
     padding: 0.5rem;
@@ -69,6 +73,9 @@
 .m_l_group{
     height: 2rem;
     background-color: white;
+    width: fit-content;
+    padding: 0 1rem;
+    border-radius: 1rem;
     display: flex;
     gap: 0.5rem;
     align-items: center;
@@ -377,4 +384,11 @@
     object-fit: contain;
     object-position: center;
     filter: invert(100%);
+}
+
+
+/* ==추가=============--------------------====================== */
+#message {
+    position: static;
+    overflow: auto;
 }

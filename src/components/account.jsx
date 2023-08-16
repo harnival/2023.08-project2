@@ -77,7 +77,8 @@ export default function Account(props){
                     uid : userID,
                     group : data.group,
                     like : data.like,
-                    follower: data.follower
+                    follower: data.follower,
+                    description : data.description
                 }))
             } else {
                 console.log("ddddddd")
@@ -499,46 +500,49 @@ export default function Account(props){
             <div className="accountBox">
                 <div className="acc_info">
                     <div className="acc_i_account">
-                        <div className="acc_i_a_avatar">
-                            <img src={userInfo.photoURL} />
-                        </div>
-                        <div className="acc_i_a_name">
-                            <p className="acc_i_a_n_name">{userInfo.name}</p>
-                            <p className="acc_i_a_n_id">@{userInfo.id}</p>
-                            <p className='acc_i_a_n_desc'>{userInfo.description}</p>
-                            <p className="acc_i_a_n_follow">팔로워 <strong>{userInfo.follower? userInfo.follower.length : 0}</strong></p>
-                                {userID !== useAuth.currentUser.uid?(
-                                    <div className="acc_i_a_btn1">
-                                        <button type="button" onClick={() => setopenUserMenu(state => !state)}>사용자 메뉴</button>
-                                        {openUserMenu && (
-                                            <ul className="acc_i_a_b_menu">
-                                                <li><a href='/#' onClick={(e) => e.preventDefault()}>follow</a></li>
-                                                <li><a href='/#' onClick={(e) => {e.preventDefault(); sendMessage()}}>send message</a></li>
-                                                <li><a href='/#' onClick={(e) => e.preventDefault()}>group</a></li>
-                                                <li><a href='/#' onClick={(e) => e.preventDefault()}>block</a></li>
-                                            </ul>
-                                        )}
-                                    </div>) : (
-                                       <div className="acc_i_a_btn1">
-                                            <button type='button' onClick={() => setopenUserMenu(state => !state)}>프로필 수정</button>
-                                            {openUserMenu && (
-                                            <ul className="acc_i_a_b_menu">
-                                                <li><a href='/#' onClick={(e) => e.preventDefault()}>edit profile</a></li>
-                                                <li><a href='/#' onClick={(e) => {e.preventDefault(); userLogout()}}>logout</a></li>
-                                            </ul>
-                                        )}
-                                       </div>
-                                    )}
-                        </div>
-                        {userID !== useAuth.currentUser.uid? (
-                            <div className="acc_i_followBtn">
-                                {userInfo.follower && userInfo.follower.includes(useAuth.currentUser.uid)? (
-                                    <a href="/#" className='acc_i_f_cancel'>cancel follow</a>
-                                ):(
-                                    <a href="/#" className='acc_i_f_follow' onClick={(e) => {e.preventDefault(); followUser(userID)}}>follow</a>
-                                )}
+                        <div className="acc_i_account_box">
+                            <div className="acc_i_a_avatar">
+                                <img src={userInfo.photoURL} />
                             </div>
-                        ) : null }
+                            <div className="acc_i_a_name">
+                                <p className="acc_i_a_n_name">{userInfo.name}</p>
+                                <p className="acc_i_a_n_id">@{userInfo.id}</p>
+                                <p className='acc_i_a_n_desc' style={{padding : '1rem 0 1rem 1rem'}}>{userInfo.description}</p>
+                                <p className="acc_i_a_n_follow">팔로워 <strong>{userInfo.follower? userInfo.follower.length : 0}</strong></p>
+                                    {userID !== useAuth.currentUser.uid?(
+                                        <div className="acc_i_a_btn1">
+                                            <button type="button" onClick={() => setopenUserMenu(state => !state)}>사용자 메뉴</button>
+                                            {openUserMenu && (
+                                                <ul className="acc_i_a_b_menu">
+                                                    <li><a href='/#' onClick={(e) => e.preventDefault()}>follow</a></li>
+                                                    <li><a href='/#' onClick={(e) => {e.preventDefault(); sendMessage()}}>send message</a></li>
+                                                    <li><a href='/#' onClick={(e) => e.preventDefault()}>group</a></li>
+                                                    <li><a href='/#' onClick={(e) => e.preventDefault()}>block</a></li>
+                                                </ul>
+                                            )}
+                                        </div>) : (
+                                        <div className="acc_i_a_btn1">
+                                                <button type='button' onClick={() => setopenUserMenu(state => !state)}>프로필 수정</button>
+                                                {openUserMenu && (
+                                                <ul className="acc_i_a_b_menu">
+                                                    <li><a href='/#' onClick={(e) => e.preventDefault()}>edit profile</a></li>
+                                                    <li><a href='/#' onClick={(e) => {e.preventDefault(); userLogout()}}>logout</a></li>
+                                                </ul>
+                                            )}
+                                        </div>
+                                        )}
+                            </div>
+                            {userID !== useAuth.currentUser.uid? (
+                                <div className="acc_i_followBtn">
+                                    {userInfo.follower && userInfo.follower.includes(useAuth.currentUser.uid)? (
+                                        <a href="/#" className='acc_i_f_cancel'>cancel follow</a>
+                                    ):(
+                                        <a href="/#" className='acc_i_f_follow' onClick={(e) => {e.preventDefault(); followUser(userID)}}>follow</a>
+                                    )}
+                                </div>
+                            ) : null }
+
+                        </div>
                         <div className="acc_i_pageMenu">
                             <ul>
                                 <li><button type='button' onClick={() => setuserPage(state => 0)}>feed</button></li>

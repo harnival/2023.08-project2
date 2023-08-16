@@ -15,7 +15,6 @@ export default function MessageUnit(props){
     useEffect(function(){
         if(msgData){
             setloadingComp(false)
-            console.log(msgData)
         }
     },[])
 
@@ -120,7 +119,7 @@ export default function MessageUnit(props){
                 <div className="m_t_account">
                     {msgData.group && (
                         <div>
-                            ddddddddddddddddddd
+                            <div>{msgData.group.title}</div>
                         </div>
                     )}
                     {msgData.user.filter(v => v[0] !== useAuth.currentUser.uid).map(v => (

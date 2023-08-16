@@ -31,6 +31,15 @@ export default function App(){
     })
   },[])
   
+  // [반응형] 메세지 창 여닫이
+  const [open, setopen] = useState(false)
+  const openMessage = function(){
+    navigate('/message');
+    if(window.innerWidth <= 1023 ){
+      store.dispatch({type : 'setMessage1023On', value : true})
+    }
+  }
+
   if(useAuth.currentUser){
     return(
       <div id='app'>
@@ -58,7 +67,7 @@ export default function App(){
               <img src="/img/icons/group.svg" />
               그룹
             </li>
-            <li onClick={() => navigate('/message')}>
+            <li onClick={() => openMessage()}>
               <img src="/img/icons/message.svg" />
               메세지
             </li>
