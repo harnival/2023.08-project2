@@ -75,9 +75,9 @@ export default function Home(){
                             const get2 = get1.data();
                             return({
                                 uid : v,
-                                name : get2.general.name,
-                                id : get2.general.id,
-                                photoURL : get2.general.photoURL
+                                name : get2.name,
+                                id : get2.id,
+                                photoURL : get2.photoURL
                             })
                         })
                     )
@@ -99,9 +99,9 @@ export default function Home(){
 
                 const dataObj = {...postData,
                     media : [...mediaArr2],
-                    user_name : data2.general.name, 
-                    user_id : data2.general.id , 
-                    user_photo : data2.general.photoURL, 
+                    user_name : data2.name, 
+                    user_id : data2.id , 
+                    user_photo : data2.photoURL, 
                     userInfo : commentUserArr, 
                     postID : v.id,
                     group : {...groupObj}
@@ -140,9 +140,9 @@ export default function Home(){
     //                                 const get2 = get1.data();
     //                                 return({
     //                                     uid : v,
-    //                                     name : get2.general.name,
-    //                                     id : get2.general.id,
-    //                                     photoURL : get2.general.photoURL
+    //                                     name : get2.name,
+    //                                     id : get2.id,
+    //                                     photoURL : get2.photoURL
     //                                 })
     //                             })
     //                         )
@@ -164,9 +164,9 @@ export default function Home(){
 
     //                     const dataObj = {...postData,
     //                         media : [...mediaArr2],
-    //                         user_name : data2.general.name, 
-    //                         user_id : data2.general.id , 
-    //                         user_photo : data2.general.photoURL, 
+    //                         user_name : data2.name, 
+    //                         user_id : data2.id , 
+    //                         user_photo : data2.photoURL, 
     //                         // time : timeObj, 
     //                         userInfo : commentUserArr, 
     //                         postID : postDoc.id,
@@ -401,7 +401,7 @@ export default function Home(){
                         <ul>
                             {/* {!Object.entries(postFeed).length? ( */}
                             {!postFeed.length? (
-                                <div>텅텅.....</div>
+                                <div className='home_empty'>첫 소식을 업데이트 해보세요!</div>
                             ) : (
                                 // Object.entries(postFeed).sort((a,b) => a[1].time - b[1].time).reverse().map((v,i) => {
                                 postFeed.sort((a,b) => a[1].time - b[1].time).reverse().map((v,i) => {

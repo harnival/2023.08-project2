@@ -1,7 +1,8 @@
 import { getDoc, onSnapshot, doc, query, collection, deleteDoc, getDocs, where, addDoc, updateDoc, arrayUnion, Timestamp, arrayRemove } from 'firebase/firestore';
 import '../css/account.css'
+import '../css/account_1023.css'
 import { useEffect, useState, useRef, useCallback, memo } from 'react';
-import { useAuth, useFirestore } from '../datasource/firebase';
+import { useAuth, useFirestore, userLogout } from '../datasource/firebase';
 import { useParams, useNavigate } from 'react-router-dom';
 import store from '../store/store';
 
@@ -70,9 +71,9 @@ export default function Account(props){
             if(snapshot.data()){
                 const data = snapshot.data();
                 setuserInfo(state => ({
-                    name : data.general.name,
-                    photoURL : data.general.photoURL? data.general.photoURL : null,
-                    id : data.general.id,
+                    name : data.name,
+                    photoURL : data.photoURL? data.photoURL : null,
+                    id : data.id,
                     uid : userID,
                     group : data.group,
                     like : data.like,
@@ -84,17 +85,6 @@ export default function Account(props){
         })
     },[userID])
 
-    const changeTime = function(timestamp){
-        const time = timestamp * 1000;
-        const timeObj = {
-            year : new Date(time).getFullYear(),
-            month : new Date(time).getMonth() +1,
-            date : new Date(time).getDate(),
-            hour : new Date(time).getHours() <10? "0"+new Date(time).getHours() : new Date(time).getHours(),
-            minute : new Date(time).getMinutes() <10? "0"+new Date(time).getMinutes() : new Date(time).getMinutes(),
-        }
-        return `${timeObj.year}/${timeObj.month}/${timeObj.date} ${timeObj.hour}:${timeObj.minute}`
-    }
 
     const loadPost =async function(v,postData){
         let commentUserArr = [];
@@ -107,9 +97,9 @@ export default function Account(props){
                                 const get2 = get1.data();
                                 return({
                                     uid : v,
-                                    name : get2.general.name,
-                                    id : get2.general.id,
-                                    photoURL : get2.general.photoURL
+                                    name : get2.name,
+                                    id : get2.id,
+                                    photoURL : get2.photoURL
                                 })
                             })
                         )
@@ -200,9 +190,9 @@ export default function Account(props){
                                 const get2 = get1.data();
                                 return({
                                     uid : v,
-                                    name : get2.general.name,
-                                    id : get2.general.id,
-                                    photoURL : get2.general.photoURL
+                                    name : get2.name,
+                                    id : get2.id,
+                                    photoURL : get2.photoURL
                                 })
                             })
                         )
@@ -225,9 +215,9 @@ export default function Account(props){
 
                     const dataObj = {...postData,
                         media : [...mediaArr2],
-                        user_name : user2.general.name, 
-                        user_id : user2.general.id , 
-                        user_photo : user2.general.photoURL, 
+                        user_name : user2.name, 
+                        user_id : user2.id , 
+                        user_photo : user2.photoURL, 
                         userInfo : commentUserArr, 
                         postID : v.id,
                         group : {...groupObj}
@@ -355,7 +345,7 @@ export default function Account(props){
             async function getFirstLike(){
                 if(v.like && !!v.like.length){
                     const getID = await getDoc(doc(useFirestore,'account',v.like[0]))
-                    const getUser = getID.data().general.id;
+                    const getUser = getID.data().id;
                     if(v.like.length === 1){
                         setlikeText(state => `@${getUser} 님이 좋아합니다.`)
                     } else if( v.like.length > 1) {
@@ -430,7 +420,7 @@ export default function Account(props){
                 <div className="acc_f_comment">
                     <div className="acc_f_com_like">
                         <div className='acc_f_com_like_like'>
-                            <button type='button' onClick={() => checkLike()} className={ v.like.includes(useAuth.currentUser.uid) && `likeChecked`}>likes</button>
+                            <button type='button' onClick={() => checkLike()} className={ v.like.includes(useAuth.currentUser.uid)? `likeChecked` : null}>likes</button>
                             <span>{v.like && likeText}</span>
                         </div>
                         <div className='acc_f_com_like_send'>
@@ -449,7 +439,7 @@ export default function Account(props){
                                     </div>
                                     <div className="acc_f_com_u_text">
                                         {val.text}
-                                        <div className="acc_f_com_u_time">{changeTime(val.time)}</div>
+                                        <div className="acc_f_com_u_time">{timeInvert(val.time)}</div>
                                     </div>
                                 </li>
                             ))
@@ -503,9 +493,6 @@ export default function Account(props){
         )
     })
 
-
-    
-
 //  return ================================================================ //
     return(
         <div id="account">
@@ -532,12 +519,12 @@ export default function Account(props){
                                             </ul>
                                         )}
                                     </div>) : (
-                                       <div className="acc_i_a_btn2">
+                                       <div className="acc_i_a_btn1">
                                             <button type='button' onClick={() => setopenUserMenu(state => !state)}>프로필 수정</button>
                                             {openUserMenu && (
                                             <ul className="acc_i_a_b_menu">
                                                 <li><a href='/#' onClick={(e) => e.preventDefault()}>edit profile</a></li>
-                                                <li><a href='/#' onClick={(e) => e.preventDefault()}>logout</a></li>
+                                                <li><a href='/#' onClick={(e) => {e.preventDefault(); userLogout()}}>logout</a></li>
                                             </ul>
                                         )}
                                        </div>

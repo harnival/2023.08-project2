@@ -35,7 +35,7 @@ export default function PostComponent({postData ,postID}){
         async function getFirstLike(){
             if(likeData && !!likeData.length){
                 const getID = await getDoc(doc(useFirestore,'account',likeData[0]))
-                const getUser = getID.data().general.id;
+                const getUser = getID.data().id;
                 if(likeData.length === 1){
                     setlikeText(state => `@${getUser} 님이 좋아합니다.`)
                 } else if( likeData.length > 1) {
@@ -109,13 +109,15 @@ export default function PostComponent({postData ,postID}){
     const contentHeight = useRef();
     const commentHeight = useRef();
     useEffect(function(){
-        if(contentHeight.current && commentHeight.current){
-            const  hei1 = contentHeight.current.offsetHeight;
-            const  hei2 = commentHeight.current.offsetHeight;
-            if( hei1 > hei2){
-                commentHeight.current.style.height = `${hei1}px`
-            } else if(hei1 < hei2) {
-                contentHeight.current.style.height = `${hei2}px`
+        if(window.innerWidth > 1023){
+            if(contentHeight.current && commentHeight.current){
+                const  hei1 = contentHeight.current.offsetHeight;
+                const  hei2 = commentHeight.current.offsetHeight;
+                if( hei1 > hei2){
+                    commentHeight.current.style.height = `${hei1}px`
+                } else if(hei1 < hei2) {
+                    contentHeight.current.style.height = `${hei2}px`
+                }
             }
         }
     },[commentData])

@@ -1,7 +1,7 @@
-import { collection, onSnapshot, where, query, getDoc, doc } from "firebase/firestore";
+import { collection, onSnapshot, where, query, getDocs, getDoc, doc, updateDoc, arrayRemove, arrayUnion, orderBy, addDoc } from "firebase/firestore";
 import { useEffect, useState, memo } from "react";
-import { useParams, useLocation, Link } from "react-router-dom"
-import { useFirestore } from "../datasource/firebase";
+import { useParams, useLocation, Link, useNavigate } from "react-router-dom"
+import { useAuth, useFirestore } from "../datasource/firebase";
 
 import '../css/groupUnit.css'
 import PostComponent from './post.jsx'
@@ -14,6 +14,7 @@ export default function GroupUnit(props) {
     const [loadPage, setloadPage] = useState({})
     const [pageInfo, setpageInfo] = useState({})
     const location = useLocation()
+    const navigate = useNavigate()
 
     useEffect(function(){
         const data = location.state.data;
@@ -40,9 +41,9 @@ export default function GroupUnit(props) {
                                 const get2 = get1.data();
                                 return({
                                     uid : val,
-                                    name : get2.general.name,
-                                    id : get2.general.id,
-                                    photoURL : get2.general.photoURL
+                                    name : get2.name,
+                                    id : get2.id,
+                                    photoURL : get2.photoURL
                                 })
                             })
                         )
@@ -66,9 +67,9 @@ export default function GroupUnit(props) {
 
                     const data3 = {...v.data(),
                         media : [...mediaArr2],
-                        user_name : data2.general.name, 
-                        user_id : data2.general.id , 
-                        user_photo : data2.general.photoURL, 
+                        user_name : data2.name, 
+                        user_id : data2.id , 
+                        user_photo : data2.photoURL, 
                         userInfo : commentUserArr, 
                         postID : v.id,
                         group : {...groupObj}
@@ -80,6 +81,68 @@ export default function GroupUnit(props) {
         })
     },[currentPage])
 
+    const [openGroupMenu, setopenGroupMenu] = useState(false)
+    const groupOut = function(){
+        const groupdb = doc(useFirestore, 'groups', groupID);
+        const uid = useAuth.currentUser.uid;
+
+        updateDoc(groupdb,{
+            user : arrayRemove(uid)
+        });
+        const userdb = doc(useFirestore,'account', uid);
+        updateDoc(userdb,{
+            group : { [groupID] : null }
+        })
+    }
+    const groupIn = function(){
+        const groupdb = doc(useFirestore, 'groups', groupID);
+        const uid = useAuth.currentUser.uid;
+    
+        updateDoc(groupdb,{
+            user : arrayUnion(uid)
+        });
+        const userdb = doc(useFirestore,'account', uid);
+        updateDoc(userdb,{
+            group : { [groupID] : pageInfo.title }
+        })
+    }
+
+    const [categoryPage, setcategoryPage] = useState(0);       // 카테고리 페이지 위치
+    const [chatList, setchatList] = useState([])
+    useEffect(function(){
+        async function gc(){
+            const chatQuery = query(collection(useFirestore,'messages'),where('group','==',groupID),orderBy('group'));
+            const cq1 = await getDocs(chatQuery);
+            const cq2 = cq1.docs;
+            const cq3 = await Promise.all(
+                cq2.map(async(v) => {
+                    const timeSort = [...v.data().contents].sort((a,b) => a.time - b.time)
+                    const userArr = await Promise.all(
+                        v.data().user.map(async(val) => {
+                            const qq = await getDoc(doc(useFirestore,'account',val))
+                            const qq2 = qq.data()
+                            const infos = [val , {name : qq2.name, photoURL : qq2.photoURL, id : qq2.id}]
+                            return infos
+                        })
+                    )
+                    return {...v.data(), contents : timeSort , user : userArr, pageID : v.id}
+                })
+            )
+            setchatList(state => [...cq3])
+        }
+        gc()
+    },[])
+
+    const newGroupChat = async function(){
+        const msgdb = collection(useFirestore,'messages');
+        const msgId = await addDoc(msgdb,{
+            contents: [],
+            user : [ useAuth.currentUser.uid ],
+            group : groupID,
+            number : chatList.length
+        });
+        navigate(`/message/${msgId.id}`);
+    }
     // component ============= //
     const GroupUnitPostComponent = memo(PostComponent);
 
@@ -104,44 +167,65 @@ export default function GroupUnit(props) {
                     </Link>
                 </div>
                 <div className="gu_i_option">
-                    <button>옵션</button>
-                    <div className="gu_i_o_list">
-                        <ul>
-                            <li><button>그룹 신고</button></li>
-                            {Object.keys(store.getState().setCurrentUser.group).find(v => v === groupID)? (
-                                <li><button>그룹에서 나가기</button></li>
-                            ):(
-                                <>
-                                    <li><button>그룹 참가하기</button></li>
-                                    <li><button>그룹 차단</button></li>
-                                </>
-                                
-                            )}
-                        </ul>
-                    </div>
+                    <button onClick={() => setopenGroupMenu(state => !state)}>옵션</button>
+                    {openGroupMenu && (
+                        <div className="gu_i_o_list">
+                            <ul>
+                                <li><button>그룹 신고</button></li>
+                                {Object.keys(store.getState().setCurrentUser.group).find(v => v === groupID)? (
+                                    <li><button onClick={() => groupOut()}>그룹에서 나가기</button></li>
+                                ):(
+                                    <>
+                                        <li><button onClick={() => groupIn()}>그룹 참가하기</button></li>
+                                        <li><button>그룹 차단</button></li>
+                                    </>
+                                    
+                                )}
+                            </ul>
+                        </div>
+                    )}
                 </div>
             </div>
             <div className="gu_tab">
                 <div className="gu_tab_box">
                     <div className="gu_tab_line"></div>
-                    <button>dashboard</button>
+                    <button onClick={() => setcategoryPage(state => 0)}>dashboard</button>
                     <div className="gu_tab_line"></div>
-                    <button>group chat</button>
+                    <button onClick={() => setcategoryPage(state => 1)}>group chat</button>
                     <div className="gu_tab_line"></div>
                 </div>
             </div>
             <div className="gu_main">
-                <ul>
-                    {!Object.entries(loadPage).length? (
+                {categoryPage===0 && (
+                    <ul>
+                        {!Object.entries(loadPage).length? (
+                            <li>
+                                <strong>텅텅....</strong>
+                            </li>
+                        ):(
+                            Object.entries(loadPage).sort((a,b) => a[1].time - b[1].time).map(v => (
+                                <GroupUnitPostComponent postData={v[1]} postID={v[0]} key={`groupUnit_${v[0]}`}/>
+                            ))
+                        )}
+                    </ul>
+                )}
+                {categoryPage===1 && (
+                    <ul>
                         <li>
-                            <strong>텅텅....</strong>
+                            <div className="gu_m_gc_new">
+                                <button onClick={() => newGroupChat()}>그룹챗 생성</button>
+                            </div>
                         </li>
-                    ):(
-                        Object.entries(loadPage).sort((a,b) => a[1].time - b[1].time).map(v => (
-                            <GroupUnitPostComponent postData={v[1]} postID={v[0]} key={`groupUnit_${v.postID}`}/>
-                        ))
-                    )}
-                </ul>
+                        {chatList.map((v,i) => (
+                            <li key={v.pageID}>
+                                <p>Group Chat #{i}</p>
+                                <div className="gu_m_gc_box">
+
+                                </div>
+                            </li>
+                        ))}
+                    </ul>
+                )}
 
             </div>
         </div>

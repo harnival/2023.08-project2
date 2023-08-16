@@ -5,6 +5,9 @@
     align-items: center;
     gap: 1rem;
     position: relative;
+    border-bottom-left-radius: 2rem;
+    border-bottom-right-radius: 2rem;
+    padding: 1rem 0;
 }
 .gu_i_image {
     height: max(8rem, 15vh);
@@ -59,6 +62,7 @@
     height: 2rem;
     border: 0;
     background-color: white;
+    cursor: pointer;
 }
 .gu_tab button:hover{
     background-color: #ccc;

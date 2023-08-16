@@ -315,3 +315,330 @@
 .h_f_com_input button:hover{
     background-color: rgba(65, 105, 225, 0.7);
 }
+
+
+/* ============================================================================= */
+@media screen and (max-width : 1023px){
+    .h_f_list{
+    width: 80%;
+    margin: auto;
+    /* background-color: white; */
+    padding: 2rem 0;
+}
+.h_f_list_box{
+    
+    /* ------------------------- */
+    width: 100%;
+    display: block;
+    justify-content: stretch;
+    position: relative;
+}
+.h_f_content {
+    width: 100%;
+    padding-bottom: 1.5rem;
+}
+.h_f_c_group {
+    width: fit-content;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: royalblue;
+    padding: 0.3rem 1rem;
+    border-radius: 1rem;
+    color: white;
+    cursor: pointer;
+}
+.h_f_c_g_image {
+    height: 90%;
+    aspect-ratio: 1/1;
+    border: 1px solid black;
+    border-radius: 20%;
+    background-color: white;
+    overflow: hidden;
+}
+.h_f_c_g_image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+.h_f_c_account {
+    height: max(3rem, 8vh);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    position: relative;
+    padding: 0.5rem;
+    box-sizing: border-box;
+}
+
+.h_f_c_acc_avatar {
+    height: 90%;
+    aspect-ratio: 1/1;
+    border: 1px solid black;
+    border-radius: 20%;
+    overflow: hidden;
+    cursor: pointer;
+    background-color: white;
+    box-shadow: 1px 0px 2px 0px rgb(0,0,0,0.4);
+}
+.h_f_c_acc_name {
+    cursor: pointer;
+}
+.h_f_c_acc_avatar img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+.h_f_c_acc_name span{
+    font-size: 80%;
+    color: #444;
+}
+.h_f_c_acc_sub {
+    position: absolute;
+    right: 0;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+.h_f_c_acc_sub > span {
+    font-size: 80%;
+    color: #444;
+}
+.h_f_c_acc_sub_options {
+    background-color: white;
+    box-shadow: 1px 2px 5px 0px rgb(0,0,0,0.5);
+    position: absolute;
+    top: 100%;
+    right: 0;
+}
+.h_f_c_acc_sub_options button{
+    text-align: center;
+    min-width: 5rem;
+    display: block;
+    padding: 0.5rem;
+    border: 0;
+    cursor: pointer;
+}
+
+.h_f_c_acc_optionBtn{
+    width: 2rem;
+    height: 2rem;
+    font-size: 0;
+    background: url('../img/dots-vertical.svg') no-repeat center / 80%;
+    cursor: pointer;
+    border: 0;
+}
+.h_f_c_text {
+    min-height: 1rem;
+    width: 90%;
+    margin: auto;
+    padding: 0.5rem 0;
+}
+.h_f_c_image {
+    width: 100%;
+    aspect-ratio: 1.4/1;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.h_f_c_image_left ,
+.h_f_c_image_right {
+    position: absolute;
+    border: 0;
+    width: 3rem;
+    aspect-ratio: 1/1;
+    font-size: 0px;
+    cursor: pointer;
+    display: block;
+    background-color: transparent;
+}
+.h_f_c_image_left {
+    left: 0;
+}
+.h_f_c_image_right {
+    right: 0;
+} 
+.h_f_c_image_left img ,
+.h_f_c_image_right img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+    background-color: transparent;
+    filter:invert(100%);
+}
+.h_f_c_image_slide{
+    display: flex;
+    height: 100%;
+    transition: .3s ease;
+    position: relative;
+}
+.h_f_c_image_unit {
+    height: 100%;
+    width: calc( 100vw * 0.8 * 0.64);
+    max-width: calc( 1280px * 0.8 * 0.64 );
+    min-width: 50vh;
+    background-color: black;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.h_f_c_image_unit img{
+    height: 100%;
+    background-color: white;
+}
+.h_f_comment {
+    width: 100%;
+    display: flex;
+    align-items: end;
+    border-radius: 1.5rem;
+    overflow: hidden;
+    background-color: white;
+
+}
+.h_f_commentBox{
+    width: 100%;
+}
+.no_reply {
+    box-sizing: border-box;
+    /* ---------------------- */
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    padding: 5% 0;
+    color: rgb(0,0,0,0.5);
+    font-size: 80%;
+    background-color: white;
+}
+.h_f_com_like {
+    background-color: #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1rem;
+}
+.h_f_com_like_likeWrap {
+    display: flex;
+    gap: 0.5rem;
+}
+.h_f_com_like_likeWrap p{
+    font-size: 90%;
+    height: 100%;
+    height: 1.5rem;
+}
+.h_f_com_like_like {
+    border: 0;
+    width: 1.5rem;
+    height: 1.5rem;
+    font-size: 0;
+    background: url('../img/heart-outline.svg') no-repeat center /contain;
+    cursor: pointer;
+}
+.h_f_com_like_like.likeChecked {
+    background: url('../img/heart.svg') no-repeat center / contain;
+}
+.h_f_com_like_sendWrap button {
+    cursor: pointer;
+    border: 0;
+    width: 1.5rem;
+    height: 1.5rem;
+    font-size: 0;
+    background: url('../img/send.svg') scroll no-repeat center / contain;
+    border-radius: 20%;
+}
+.h_f_com_like_sendWrap button:active {
+    background-color: #ccc;
+}
+.h_f_com_unit {
+    border-bottom: 1px solid #eee;
+    width: 100%;
+    padding: 0.5rem;
+    box-sizing: border-box;
+}
+.h_f_com_u_account {
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    position: relative;
+}
+.h_f_com_u_avatar {
+    height: 70%;
+    aspect-ratio: 1/1;
+    border: 1px solid #666;
+    border-radius: 20%;
+    overflow: hidden;
+    background-color: white;
+}
+.h_f_com_u_avatar img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+.h_f_com_u_time {
+    font-size: 80%;
+    color: #aaa;
+    position: absolute;
+    right: 0;
+}
+.h_f_com_u_name {
+    font-size: 80%;
+}
+.h_f_com_u_text{
+    width: 90%;
+    margin: auto;
+    padding: 0.5rem 0;
+}
+.h_f_com_lists {
+    position: relative;
+    flex: 1;
+    overflow: auto;
+    display: flex;
+    flex-direction: column-reverse;
+}
+.h_f_com_lists ul {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+.h_f_com_input {
+    background-color: white;
+    width: 100%;
+}
+.h_f_com_input form{
+    display: flex;
+    justify-content: space-between;
+}
+
+.h_f_com_input textarea::placeholder {
+    color: #bbb;
+}
+.h_f_com_input textarea {
+    resize: none;
+    border: 0;
+    background-color: transparent;
+    padding: 1rem 1rem 0;
+    flex: 1;
+    font-size: 100%;
+    outline:none;
+    word-break: break-all;
+}
+.h_f_com_input button{
+    cursor: pointer;
+    aspect-ratio: 1/1;
+    border: 0;
+    background-color: transparent;
+    transition: .3s ease;
+}
+.h_f_com_input button:hover{
+    background-color: rgba(65, 105, 225, 0.7);
+}
+
+}

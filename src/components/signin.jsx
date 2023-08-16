@@ -73,7 +73,6 @@ export default function Signin(){
                 getDocs(getQuery)
                 .then( snapshot => {
                     const dataArr = snapshot.docs;
-                    console.log(dataArr, !dataArr.length)
                     if(dataArr.length){
                         setrequiredAuth(state => ({...state, email : 2}))
                     } else {

@@ -54,31 +54,36 @@
     background: transparent url('../img/group-add.svg') no-repeat center/ 50%;
 }
 
-
+.g_b_main{
+    width: 80%;
+    margin: auto;
+}
+.g_b_main h3 {
+    padding: 2rem 0;
+}
 .g_b_my ul,
 .g_b_popular ul {
     display: flex;
     flex-wrap: wrap;
 }
 .g_b_my_list{
-    width: calc(100% / 3);
+    width: calc(100% / 4);
+    aspect-ratio: 1/1;
     box-sizing: border-box;
-
-    display: flex;
-    padding: 0 2rem;
+    position: relative;
+    border-radius: 20%;
+    overflow: hidden;
+    cursor: pointer;
 }
 .g_b_my_img {
-    width: 50%;
-    aspect-ratio: 1/1;
+    width: 100%;
+    height: 100%;
     position: relative;
 }
 .g_b_img_wrap {
     width: 100%;
     height: 100%;
-    border: 1px solid black;
     background-color: white;
-    border-radius: 20%;
-    overflow: hidden;
 }
 .g_b_img_wrap img {
     width: 100%;
@@ -96,7 +101,20 @@
     background-color: red;
     color: white;
 }
-
+.g_b_my_text{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, transparent,rgb(0,0,0,0.8));
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
+    padding: 1rem;
+    box-sizing: border-box;
+    color: white;
+}
 .g_new {
     width: 100%;
     height: 30vh;

@@ -71,7 +71,7 @@ const registUser = function(info){
       uid : user.uid
     }
     setDoc(doc(useFirestore,'account', user.uid),{
-      general : generals,
+      ...generals,
       group : {},
       follower : [],
       like : [],

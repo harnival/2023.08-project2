@@ -1,0 +1,93 @@
+.s_search {
+    height: 4rem;
+    display: flex;
+    justify-content: center;
+}
+.s_s_inputBox {
+    border-left: 1px solid black;
+    border-right: 1px solid black;
+    width: 50%;
+    box-sizing: border-box;
+}
+.s_s_inputBox input {
+    border: 0;
+    background-color: transparent;
+    height: 100%;
+    width: 100%;
+    font-size: 100%;
+    padding: 0 1rem;
+    box-sizing: border-box;
+    outline-color: #666;
+}
+.s_s_inputBox input::placeholder {
+    font-size: 80%;
+}
+.s_s_btn{
+    border-right: 1px solid black;
+    width: 4rem;
+    box-sizing: border-box;
+}
+.s_s_btn button{
+    width: 100%;
+    height: 100%;
+    border: 0;
+    cursor: pointer;
+    transition: .3s ease;
+    font-size: 0px;
+    background: white url('../img/search.svg') no-repeat center/ 50%;
+}
+.s_s_btn button:hover {
+    filter: invert(70%);
+}
+/* ==================================================== */
+.s_main{
+    width: 80%;
+    margin: auto;
+
+}
+.s_m_text {
+    font-size: 150%;
+    width: 80%;
+    margin: auto;
+    padding: 1rem 0;
+}
+.s_m_list h3 {
+    font-size: 150%;
+    padding: 1rem 5%;
+    box-sizing: border-box;
+}
+.s_m_l_section1 ul{
+    display: flex;
+    flex-wrap: wrap;
+    width: 80%;
+    margin: auto;
+}
+.s_m_l_section1_list {
+    width: calc(100% / 4);
+    display: flex;
+    padding: 1rem;
+    cursor: pointer;
+    color: white;
+    border-radius: 1rem;
+}
+.s_m_l_section1_list:nth-child(2n){
+    background: linear-gradient(to bottom, rgb(25, 151, 113),rgb(23, 48, 124));
+}
+.s_m_l_section1_list:nth-child(2n+1){
+    background: linear-gradient(to top, rgb(25, 151, 113),rgb(23, 48, 124));
+}
+
+.s_m_l_user_image {
+    width: max(10%, 4rem);
+    aspect-ratio: 1/1;
+    border-radius: 1rem;
+    overflow: hidden;
+    border: 1px solid black;
+    background-color: white;
+}
+.s_m_l_user_image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}

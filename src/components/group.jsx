@@ -14,6 +14,7 @@ export default function Group(){
     const [limitDesc, setlimitDesc] = useState()
     const [searchList, setsearchList] = useState([]);
     const [recomGroup, setrecomGroup] = useState([]);
+    const [loadDone, setloadDone] = useState(true)
 
     useEffect(function(){   //그룹 게시물 변화 감시
        
@@ -31,33 +32,45 @@ export default function Group(){
         }
         callFirst()
     },[])
-    useEffect(function(){
+    useEffect(function(){   // 추천 그룹 로드
         async function recomm(){
-            const groups = Object.entries(store.getState().setCurrentUser.group);
-            const groupLen = groups.length;
-            const chooseGroup = Math.floor(Math.random()*groupLen);
-            const userList =await  getDoc(doc(useFirestore,'groups',groups[chooseGroup][0]))
-            const userListData = userList.data().user;
-            setrecomGroup(state => state[0] = groups[chooseGroup])
-            
-            const total = {};
-            await Promise.all(userListData.map(v => {
-                getDoc(useFirestore,'account',v)
-                .then(snapshot => Object.keys(snapshot.data().group))
-                .then(data => {
-                    data.forEach(v => total[v] = (total[v]||0)+1)
-                })
-            }))
-            await Promise.all(Object.entries(total).sort((a,b) => a[1] - b[1]).map((v,i) => {
-                if(i < 10){
-                    getDoc(doc(useFirestore,'groups',v[0]))
-                    .then(snapshot => snapshot.data())
-                    .then(data => setrecomGroup(state => state[1] = [...state[1], data]))
+                const callGroup2 = callGroup.filter(v => !Object.keys(store.getState().setCurrentUser.group).includes(v.id))
+                const groupLen = callGroup2.length;
+                const chooseGroup = Math.floor(Math.random()*groupLen);
+                if( groupLen > 0) {
+                    const userList =await  getDoc(doc(useFirestore,'groups',callGroup2[chooseGroup].id))
+                    const userListData = userList.data().user;
+                    
+                    const total = {};
+                    const rec1 = await Promise.all(
+                        userListData.map(async(v) => {
+                            const db = doc(useFirestore,'account',v);
+                            const q1 = await getDoc(db);
+                            const q2 = q1.data().group
+                            for(const key in q2){
+                                total[key] = (total[key]||0)+1
+                            }
+                        })
+                    )
+                    const total2 = [];
+                    const rec2 = await Promise.all(
+                        Object.entries(total).sort((a,b) => a[1] - b[1]).map(async(v,i) => {
+                        if(i < 10){
+                            const w1 = await getDoc(doc(useFirestore,'groups',v[0]))
+                            const w2 = w1.data()
+                            total2.push([w1.id, w2])
+                        }
+                    }))
+                    setrecomGroup(state => [callGroup[chooseGroup].title, total2])
+                    return setloadDone(false)
                 }
-            }))
         }
-        recomm()
-    },[])
+            recomm()
+    },[callGroup])
+
+    useEffect(function(){
+        console.log("fhsreustrioyhejtpsghoei", recomGroup)
+    },[recomGroup])
     // 그룹 생성 //
     const [selectAvatar, setselectAvatar] = useState()
     let imageFileReader = useRef();
@@ -155,30 +168,52 @@ export default function Group(){
             <div className="g_b_main">
                 <div className="g_b_my">
                     <h3>내가 참여한 그룹</h3>
-                    <ul>
-                        {callGroup.map(v => (
-                        <li className='g_b_my_list' key={`group_${v.id}`} onClick={() => goToUnit(v.id)}>
-                            <div className="g_b_my_img">
-                                <div className="g_b_img_wrap">
-                                    <img src={v.photoURL? v.photoURL : null}/>
+                    {Object.keys(store.getState().setCurrentUser.group).length === 0? (
+                        <div className='g_b_popular_empty'>참여한 그룹이 없습니다.</div>
+                    ):(
+                        <ul>
+                            {callGroup.map(v => (
+                            <li className='g_b_my_list' key={`group_${v.id}`} onClick={() => goToUnit(v.id)}>
+                                <div className="g_b_my_img">
+                                    <div className="g_b_img_wrap">
+                                        <img src={v.photoURL? v.photoURL : null}/>
+                                    </div>
+                                    <div className="g_b_my_alarm"></div>
                                 </div>
-                                <div className="g_b_my_alarm"></div>
-                            </div>
-                            <div className="g_b_my_text">
-                                <p>{v.title}</p>
-                                <p>{v.description}</p>
-                                <p>{v.user.length}명 참여</p>
-                            </div>
-                        </li>
-                        ))}
-                    </ul>
+                                <div className="g_b_my_text">
+                                    <p style={{ fontWeight : '600'}}>{v.title}</p>
+                                    <p style={{paddingLeft : '1rem'}}>{v.description}</p>
+                                    <p style={{textAlign : 'end', color : 'rgb(255,255,255,0.7)', fontSize : '90%'}}>{v.user.length}명 참여</p>
+                                </div>
+                            </li>
+                            ))}
+                        </ul>
+                    )}
                 </div>
                 <div className="g_b_popular">
                     <h3>추천 그룹</h3>
-                    <p>{recomGroup[0]&&recomGroup[0][1]} 그룹의 유저들이 참여한 그룹입니다.</p>
-                    <ul>
-                    
-                    </ul>
+                    {Object.keys(store.getState().setCurrentUser.group).length === 0? (
+                        <div className='g_b_popular_empty'>참여한 그룹이 없습니다.</div>
+                    ):(
+                        <>
+                            <p><strong>[{recomGroup[0]}]</strong> 그룹의 유저들이 참여한 그룹입니다.</p>
+                            <ul>
+                                {loadDone && (
+                                    <li>그룹이 없습니다.</li>
+                                )}
+                                {!loadDone && recomGroup[1].map(v => (
+                                    <li key={v[0]}>
+                                        <img src={v[1].photoURL} />
+                                        <div className="recom_text">
+                                            <p>{v[1].title}</p>
+                                            <p>{v[1].description}</p>
+                                            <p>{v[1].user.length}명 참여</p>
+                                        </div>
+                                    </li>
+                                ))}
+                            </ul>
+                        </>
+                    )}
                 </div>
 
             </div>

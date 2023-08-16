@@ -15,6 +15,7 @@ export default function MessageUnit(props){
     useEffect(function(){
         if(msgData){
             setloadingComp(false)
+            console.log(msgData)
         }
     },[])
 
@@ -73,7 +74,7 @@ export default function MessageUnit(props){
             hour : new Date(time).getHours() <10? "0"+new Date(time).getHours() : new Date(time).getHours(),
             minute : new Date(time).getMinutes() <10? "0"+new Date(time).getMinutes() : new Date(time).getMinutes(),
         }
-        return timeObj
+        return  `${timeObj.year}/${timeObj.month}/${timeObj.date} ${timeObj.hour}:${timeObj.minute}`
     }
 
     const CommentComponent = memo(function({v}){
@@ -87,13 +88,11 @@ export default function MessageUnit(props){
                         <div className="m_t_ml_name">{msgData.user.find(val => val[0] === v.uid)[1].name}</div>
                         <div className="m_t_ml_id">@{msgData.user.find(val => val[0] === v.uid)[1].id}</div>
                     </div>
-                    <div className="m_t_ml_time">
-                        <span>{`${invertTime(v.time.seconds).year}년 ${invertTime(v.time.seconds).month}월 ${invertTime(v.time.seconds).date}일 ${invertTime(v.time.seconds).hour}시 ${invertTime(v.time.seconds).minute}분`}</span>
-                    </div>
                 </div>
                 <div className="m_t_ml_content">
                     <div className="m_t_ml_c_text">
                         <p>{v.text}</p>
+                        <span>{invertTime(v.time.seconds)}</span>
                     </div>
                     {!!v.media.length && (
                         <div className="m_t_ml_c_media">
@@ -119,6 +118,11 @@ export default function MessageUnit(props){
         return(
             <div className={`messageUnit message_${pageID}`}>
                 <div className="m_t_account">
+                    {msgData.group && (
+                        <div>
+                            ddddddddddddddddddd
+                        </div>
+                    )}
                     {msgData.user.filter(v => v[0] !== useAuth.currentUser.uid).map(v => (
                         <div className="m_t_a_profile" key={`account_${v[0]}`}>
                             <div className="m_t_a_p_image">
@@ -154,10 +158,13 @@ export default function MessageUnit(props){
                             <button type="button" onClick={(e) => clickToMedia(e)}>이미지 첨부</button>
                         </div>
                         <div className="m_t_i_input">
-                            <input type="text" name="text" ref={msgTextInput}/>
+                            <input type="text" name="text" ref={msgTextInput} placeholder="메세지를 입력하세요."/>
                         </div>
                         <div className="m_t_i_submit">
-                            <button>보내기</button>
+                            <button>
+                                보내기
+                                <img src="/img/icons/arrow-up-bold.svg"/>
+                            </button>
                         </div>
                     </form>
                 </div>

@@ -34,12 +34,6 @@ export default function App(){
   if(useAuth.currentUser){
     return(
       <div id='app'>
-        <div className="headerIn">
-        <button onClick={() => userLogout()}>qqqqq</button>
-
-          <div className="header_account"></div>
-          <div className="header_group"></div>
-        </div>
         <div className="mainIn">
           {/* <Editor /> */}
           <Main />
@@ -48,7 +42,7 @@ export default function App(){
           <ul>
             <li onClick={() => navigate(`/account/${useAuth.currentUser.uid}`)}>
               <div className='myAccount_box'>
-                <img src={store.getState().setCurrentUser.general.photoURL} className='myAccount_icon'/>
+                <img src={store.getState().setCurrentUser.photoURL} className='myAccount_icon'/>
               </div>
               내 계정
             </li>
