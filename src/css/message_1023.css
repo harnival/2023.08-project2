@@ -12,17 +12,20 @@
         color: white;
     }
     #message {
+        /* -------------------- */
         position: relative;
         overflow: hidden;
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
+        height: 95vh;
     }
     .messageBox {
-        position: relative;
+        position: absolute;
         left: 0;
-        flex: 1;
+        top: 0;
+        width: 200vw;
         /* --------------------------------- */
-        max-width: auto;
+        max-width: none;
         background-color : white;
         margin: auto;
         display: flex;

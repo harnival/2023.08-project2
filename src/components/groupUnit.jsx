@@ -217,10 +217,12 @@ export default function GroupUnit(props) {
                             </div>
                         </li>
                         {chatList.map((v,i) => (
-                            <li key={v.pageID}>
-                                <p>Group Chat #{i}</p>
+                            <li key={v.pageID} className="gu_m_gc_list">
+                                <p className="gu_m_gc_l_number">Group Chat <strong>#{i}</strong></p>
                                 <div className="gu_m_gc_box">
-
+                                    <p>현재 {v.user&&v.user.length}명 참여중</p>
+                                    <p>{v.title}</p>
+                                    <p>{v.contents[v.contents.length-1].text}</p>
                                 </div>
                             </li>
                         ))}

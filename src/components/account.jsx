@@ -525,7 +525,7 @@ export default function Account(props){
                                                 <button type='button' onClick={() => setopenUserMenu(state => !state)}>프로필 수정</button>
                                                 {openUserMenu && (
                                                 <ul className="acc_i_a_b_menu">
-                                                    <li><a href='/#' onClick={(e) => e.preventDefault()}>edit profile</a></li>
+                                                    <li><a href='/#' onClick={(e) => {e.preventDefault(); navigate('/setting')}}>edit profile</a></li>
                                                     <li><a href='/#' onClick={(e) => {e.preventDefault(); userLogout()}}>logout</a></li>
                                                 </ul>
                                             )}

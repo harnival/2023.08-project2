@@ -8,7 +8,8 @@ const states = {
     currentSelectGroup : null,
     selectGroupData : {},
     pageLoadDone : true,
-    message1023On : false
+    message1023On : false,
+    currentWindowWidth : null
 }
 
 // dispatch function ====================================================================== //
@@ -39,10 +40,15 @@ const setMessage1023On = function(state = states.message1023On, action){
     }
     return state
 }
-
+const setCurrentWindowWidth = function(state = states.currentWindowWidth, action){
+    if(action.type === 'setCurrentWindowWidth'){
+        state = window.innerWidth;
+    }
+    return state
+}
 // =================================================================================
 const reducers = combineReducers({
-    setCurrentUser, setSelectGroupData, setGetGroup, setMessage1023On
+    setCurrentUser, setSelectGroupData, setGetGroup, setMessage1023On, setCurrentWindowWidth
 })
 const store = createStore(reducers);
 export default store;

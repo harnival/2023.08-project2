@@ -4,6 +4,7 @@ import Message from "./message"
 import Account from "./account"
 import Group from "./group"
 import Search from "./search"
+import Setting from './setting'
 import { useAuth } from "../datasource/firebase"
 
 import { Route, Routes, useParams } from "react-router-dom"
@@ -21,6 +22,7 @@ export default function Main(props){
                 <Route path="group/*" element={<Group />}></Route>
                 <Route path="message/*" element={<Message />}></Route>
                 <Route path={`account/:userID`} element={<Account />}></Route>
+                <Route path="/setting" element={<Setting />}></Route>
             </Routes>
         </div>
         // <div id="mainBox">

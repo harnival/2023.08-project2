@@ -2,12 +2,16 @@
     height: 4rem;
     display: flex;
     justify-content: center;
+    background: linear-gradient(60deg, rgb(139, 11, 11), rgb(182, 50, 182));
+
 }
 .s_s_inputBox {
     border-left: 1px solid black;
     border-right: 1px solid black;
     width: 50%;
     box-sizing: border-box;
+    background-color: white;
+
 }
 .s_s_inputBox input {
     border: 0;
@@ -37,7 +41,7 @@
     background: white url('../img/search.svg') no-repeat center/ 50%;
 }
 .s_s_btn button:hover {
-    filter: invert(70%);
+    background-color: rgb(255,255,255,0.3);
 }
 /* ==================================================== */
 .s_main{
