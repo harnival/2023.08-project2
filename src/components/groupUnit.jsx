@@ -133,6 +133,15 @@ export default function GroupUnit(props) {
         gc()
     },[])
 
+    const joinGroupChat = function(pageID){
+        const chatdb = doc(useFirestore,'messages',pageID);
+        updateDoc(chatdb,{
+            user : arrayUnion(useAuth.currentUser.uid)
+        })
+        .then(() => {
+            navigate(`/message/${pageID}`)
+        })
+    }
     const newGroupChat = async function(){
         const msgdb = collection(useFirestore,'messages');
         const msgId = await addDoc(msgdb,{
@@ -214,15 +223,18 @@ export default function GroupUnit(props) {
                         <li>
                             <div className="gu_m_gc_new">
                                 <button onClick={() => newGroupChat()}>그룹챗 생성</button>
+                                
                             </div>
                         </li>
                         {chatList.map((v,i) => (
-                            <li key={v.pageID} className="gu_m_gc_list">
+                            <li key={v.pageID} className="gu_m_gc_list" onClick={() => joinGroupChat(v.pageID)}>
                                 <p className="gu_m_gc_l_number">Group Chat <strong>#{i}</strong></p>
                                 <div className="gu_m_gc_box">
-                                    <p>현재 {v.user&&v.user.length}명 참여중</p>
-                                    <p>{v.title}</p>
-                                    <p>{v.contents[v.contents.length-1].text}</p>
+                                    <p className="gu_m_gc_box_1">
+                                        <span>{v.title}</span>
+                                        <span>현재 {v.user&&v.user.length}명 참여중</span>
+                                    </p>
+                                    <p className="gu_m_gc_box_2">" {v.contents[v.contents.length-1].text} "</p>
                                 </div>
                             </li>
                         ))}

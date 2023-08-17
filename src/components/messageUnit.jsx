@@ -93,36 +93,30 @@ export default function MessageUnit(props){
                         <p>{v.text}</p>
                         <span>{invertTime(v.time.seconds)}</span>
                     </div>
-                    {!!v.media.length && (
-                        <div className="m_t_ml_c_media">
-                            <ul>
-                                {v.media.map(val => (
-                                    <li><img src={val} /></li>
-                                ))}
-                            </ul>
-                        </div>
-                    )}
+                    
+                    <ul className="m_t_ml_c_media">
+                        {v.media.map(val => (
+                            <li><img src={val} /></li>
+                        ))}
+                    </ul>
+                    
                 </div>
             </li>
         )
     })
         // return================================================================//
-    if(loadingComp){
-        return(
-            <div className="loadingComps">
-                <h1>Loading....</h1>
-            </div>
-        )
-    } else {
+    if(!loadingComp){
+
         return(
             <div className={`messageUnit message_${pageID}`}>
                 <div className="m_t_account">
                     {msgData.group && (
-                        <div>
-                            <div>{msgData.group.title}</div>
+                        <div className="m_t_groupName">
+                            <span># {msgData.group.title} </span>
+                            <span>Group Chat <strong>#{msgData.number}</strong></span>
                         </div>
                     )}
-                    {msgData.user.filter(v => v[0] !== useAuth.currentUser.uid).map(v => (
+                    {msgData.user.filter(v => v[0] !== (msgData.group? null : useAuth.currentUser.uid)).map(v => (
                         <div className="m_t_a_profile" key={`account_${v[0]}`}>
                             <div className="m_t_a_p_image">
                                 <img src={v[1].photoURL}/>
@@ -170,4 +164,5 @@ export default function MessageUnit(props){
             </div>
         )
     }
+    
 }

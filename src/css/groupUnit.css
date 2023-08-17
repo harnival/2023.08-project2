@@ -1,3 +1,13 @@
+
+#groupUnit{
+    height: 100%;
+}
+.gu_main{
+    /* background-color: white; */
+    border-top-right-radius: 2rem;
+    border-top-left-radius: 2rem;
+    }
+
 .gu_info {
     background: linear-gradient(to right, rgb(28, 167, 125),transparent), linear-gradient(to top, transparent, rgb(170, 77, 170)), linear-gradient(to top, rgb(175, 53, 31), transparent);
     display: flex;
@@ -125,10 +135,42 @@
 .gu_m_gc_list {
     width: 80%;
     margin: auto;
+    height: 100%;
+    flex: 1;
+    background-color: rgb(0,0,0,0.5);
+    box-shadow: 1px 1px 1px 0px rgb(255,255,255,0.5);
+    position: relative;
+    border-radius: 1rem;
+    border-top-left-radius: 0;
+    color: white;
+    padding: 0.5rem 2rem;
+    box-sizing: border-box;
+}
+.gu_m_gc_list::before{
+    content: "";
+    display: block;
+    width: 20px;
+    height: 15px;
+    background-color: rgb(0,0,0,0.5);
+    position: absolute;
+    right: 100%;
+    top: 0;
+    
+    clip-path: path('M 0,0 L 21,0 L 21,15 Z');
 }
 .gu_m_gc_l_number{
     font-size: 120%;
-    
+    color: rgb(255,210,17);
+}
+.gu_m_gc_box_1 span:first-child{
+    font-weight: 600;
+    font-size: 120%;
+}
+.gu_m_gc_box_1 span:last-child{
+    float: right;
+}
+.gu_m_gc_box_2 {
+    padding: 0.5em 2em;
 }
 /* ====================================================================== */
 @media screen and (max-width : 1023px){

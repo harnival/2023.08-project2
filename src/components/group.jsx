@@ -192,9 +192,13 @@ export default function Group(){
                 </div>
                 <div className="g_b_popular">
                     <h3>추천 그룹</h3>
-                    {Object.keys(store.getState().setCurrentUser.group).length === 0? (
+                    {Object.keys(store.getState().setCurrentUser.group).length === 0 && (
                         <div className='g_b_popular_empty'>참여한 그룹이 없습니다.</div>
-                    ):(
+                        )}
+                    {Object.keys(store.getState().setCurrentUser.group).length === 1 && (
+                        <div className='g_b_popular_empty'>추천 그룹이 없습니다.</div>                        
+                    )}
+                    {Object.keys(store.getState().setCurrentUser.group).length > 1 &&(
                         <>
                             <p><strong>[{recomGroup[0]}]</strong> 그룹의 유저들이 참여한 그룹입니다.</p>
                             <ul>

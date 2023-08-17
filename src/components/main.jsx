@@ -25,13 +25,6 @@ export default function Main(props){
                 <Route path="/setting" element={<Setting />}></Route>
             </Routes>
         </div>
-        // <div id="mainBox">
-        //     {props.mainState === 'Home'? <Home /> : 
-        //     props.mainState === 'Message'? <Message /> : 
-        //     props.mainState === 'Account'? <Account userID={useAuth.currentUser.uid}/> : 
-        //     props.mainState === 'Group'? <Group /> :
-        //     props.mainState === 'Search'? <Search /> : null
-        //     }
-        // </div>
+      
     )
 }

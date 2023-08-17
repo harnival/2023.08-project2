@@ -111,6 +111,7 @@
     flex-direction: column;
     align-items: end;
     width: 100%;
+    background-color: transparent;
 }
 .acc_i_pageMenu li {
     width: 80%;
@@ -160,7 +161,7 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    background-color: royalblue;
+    background-color: rgb(65, 105, 225);
     padding: 0.3rem 1rem;
     border-radius: 1rem;
     color: white;

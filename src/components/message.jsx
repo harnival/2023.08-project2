@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import '../css/message.css';
 import '../css/message_1023.css'
 import MessageUnit from './messageUnit';
@@ -38,13 +38,13 @@ export default function Message(){
                         })
                     )
                     const groupInfo = {};
-                    console.log("[dfdfdafdfdf]",v.data().group)
                     if(!!v.data().group){
                         const db = doc(useFirestore,'groups',v.data().group);
                         const gi1 = await getDoc(db);
                         const gi2 = gi1.data();
                             groupInfo.title = gi2.title
                             groupInfo.photoURL = gi2.photoURL
+                            groupInfo.id = v.data().group
                     }
                     return {...v.data(), contents : timeSort , user : userArr, pageID : v.id , group : (!!v.data().group?  groupInfo: null)}
                 })
@@ -98,6 +98,7 @@ export default function Message(){
             if( pathID[0] === '/message'){
                 msgBoxRef.current.style.left = '0'
                 setnowPageID(state => null)
+                console.log("[message oooooooooooo]")
             } 
         }
         console.log(location.pathname, nowPageID)
@@ -107,12 +108,13 @@ export default function Message(){
     useEffect(function(){
         if(category){
            const list = [...callList];
-           const list2 = list.filter(v => v.group === category)
+           console.log(list)
+           const list2 = list.filter(v => v.group && v.group.id === category)
            setnowList(state => [...list2])
         } else {
             setnowList(state => [...callList])
         }
-    },[category])
+    },[category,callList])
 
     const selectCategory = function(e,id){
         e.preventDefault();
@@ -144,7 +146,9 @@ export default function Message(){
             }
         }
 
-     },[])    
+     },[]) 
+     
+    const MessageMemoComponent = memo(MessageUnit);
     return(
         <div id="message">
             <div className="messageBox"  ref={msgBoxRef}>
@@ -207,7 +211,7 @@ export default function Message(){
                 </div>
                 <Routes>
                     <Route element={<Layout />}>
-                        <Route path=':pageID' element={<MessageUnit props1={nowList.find(v => v.pageID === nowPageID)}/>}></Route>
+                        <Route path=':pageID' element={<MessageMemoComponent props1={nowList.find(v => v.pageID === nowPageID)}/>}></Route>
                     </Route>
                 </Routes>
             </div>

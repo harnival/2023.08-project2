@@ -1,3 +1,14 @@
+#app {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+.mainIn {
+    height: 100%;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
 .subNavIn {
     width: max(5%, 5rem);
     position: fixed;
@@ -52,7 +63,7 @@
         margin: auto;
     }
     .mainIn {
-        height: 90%;
+        height: 100%;
         flex: 1;
         overflow-y: auto;
         box-sizing: border-box;

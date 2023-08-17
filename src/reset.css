@@ -1,4 +1,4 @@
-body {margin: 0; padding: 0; font-size: max(14px, 0.8vw); font-weight: 400; user-select: none;}
+body {margin: 0; padding: 0; font-size: max(14px, 0.8vw); font-weight: 400; user-select: none; min-height: 100vh;}
 h1,h2,h3,h4,h5,h6 {padding: 0; margin: 0;}
 ul,li {list-style: none; padding: 0; margin: 0;}
 a {text-decoration: none; color: inherit;}

@@ -108,6 +108,9 @@ export default function Search(){
                         <button form='searchInput'>검색</button>
                     </div>
                 </div>
+                {searchDone && (
+                    <p className='s_main_empty'>검색어를 입력하세요.</p>
+                )}
                 {!searchDone && (
                 <div className="s_main">
                     <div className="s_m_text">
