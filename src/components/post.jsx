@@ -8,7 +8,6 @@ import store from "../store/store";
 import '../css/post.css'
 
 export default function PostComponent({postData ,postID}){
-
     const commentData = postData.comment;
     const likeData = postData.like;
     const commentUser = postData.userInfo
@@ -18,6 +17,8 @@ export default function PostComponent({postData ,postID}){
         like : null,
         userInfo : null
     }
+    const modalRef = useRef();
+
     const invertTime = function(value){
         const time = value * 1000;
         const timeObj = {
@@ -31,6 +32,8 @@ export default function PostComponent({postData ,postID}){
         return  `${timeObj.year}/${timeObj.month}/${timeObj.date} ${timeObj.hour}:${timeObj.minute}`
     }
     const [likeText, setlikeText] = useState('')
+    const [modal, setmodal] = useState(null)
+
     useEffect(function(){       // 좋아요 상태에 따른 문구 설정
         async function getFirstLike(){
             if(likeData && !!likeData.length){
@@ -171,6 +174,20 @@ export default function PostComponent({postData ,postID}){
                 })
             }
         },[])
+        const openModal = function(id){
+            modalRef.current.classList.add("open_modal")
+            setmodal(state => id)
+        }
+        const blockUser = function(userID){ // 유저 차단 //
+            const db = doc(useFirestore,'account',useAuth.currentUser.uid);
+            updateDoc(db,{
+                block : arrayUnion(userID)
+            })
+            .then(()=>{
+                alert("차단되었습니다.")
+            })
+        }
+        
         return(
             <div className="h_f_content" ref={contentHeight}>
             <div className="h_f_c_account">
@@ -190,10 +207,10 @@ export default function PostComponent({postData ,postID}){
                             {postData.uid === useAuth.currentUser.uid ? (
                                     <button onClick={(e) => deletePost(postID)}>삭제</button>
                             ) : (
-                                <>
-                                    <a href="/#" onClick={(e) => e.preventDefault()}>신고</a>
-                                    <a href="/#" onClick={(e) => e.preventDefault()}>차단</a>
-                                </>
+                                <div>
+                                    <a href="/#" onClick={(e) => {e.preventDefault(); openModal(postData.postID) }}>신고</a>
+                                    <a href="/#" onClick={(e) => {e.preventDefault(); blockUser(postData.uid)}}>차단</a>
+                                </div>
                             )}
                             </div>
                         )}
@@ -218,6 +235,64 @@ export default function PostComponent({postData ,postID}){
         )
     }
     const ContentComponent = memo(v => Content(v))
+
+
+    const ReportComponent = function(){
+        const close = function(){
+            modalRef.current.classList.remove("open_modal")
+            setmodal(state => null)
+        }
+        const submitReport = function(e){
+            e.preventDefault();
+            const data = Object.fromEntries(new FormData(e.target).entries());
+            const postdb = doc(useFirestore, 'posts', modal);
+            updateDoc(postdb,{
+                report : arrayUnion({...data, uid : useAuth.currentUser.uid})
+            })
+            .then(() => {
+                setmodal(state => null);
+                alert("신고가 접수되었습니다.")
+                modalRef.current.classList.remove("open_modal")
+            })
+
+        }
+        return(
+            <div className="h_report">
+                        <div className="h_f_close">
+                            <button onClick={() => close()}></button>
+                        </div>
+                <form onSubmit={(e) => submitReport(e)}>
+                    <div className="h_r_select">
+                        <div className="h_r_s_title">신고 유형</div>
+                        <ul className="h_r_s_inputBox">
+                            <li>
+                                <input type="radio" name="type" id="report1" className='h_r_s_input' value="가학적, 폭력적인 컨텐츠"/>
+                                <label htmlFor="report1">가학적, 폭력적인 컨텐츠</label>
+                            </li>
+                            <li>
+                                <input type="radio" name="type" id="report2" className='h_r_s_input' value="선정적인 컨텐츠"/>
+                                <label htmlFor="report2">선정적인 컨텐츠</label>
+                            </li>
+                            <li>
+                                <input type="radio" name="type" id="report3" className='h_r_s_input' value="타인을 사칭 및 비방, 괴롭힘 목적"/>
+                                <label htmlFor="report3">타인을 사칭 및 비방, 괴롭힘 목적</label>
+                            </li>
+                            <li>
+                                <input type="radio" name="type" id="report4" className='h_r_s_input' value="잘못된 정보, 가짜 뉴스로 혼란이 예상되는 컨텐츠"/>
+                                <label htmlFor="report4">잘못된 정보, 가짜 뉴스로 혼란이 예상되는 컨텐츠</label>
+                            </li>
+                        </ul>
+                    </div>
+                    <div className="h_r_text">
+                        <textarea name="text" id="" maxLength={100} placeholder='추가 신고 내용 입력 (100자 이내)'></textarea>
+                    </div>
+                    <div className="h_r_btn">
+                        <button>REPORT</button>
+                    </div>
+                </form>
+            </div>
+        )
+    }
     // ===========================================================================
     return(
         <li className='h_f_list'>
@@ -279,6 +354,13 @@ export default function PostComponent({postData ,postID}){
                     </div>
                 </div>
             </div>
+        </div>
+        <div className="h_f_list_modal" ref={modalRef}>
+                <div className="h_f_list_modal_report">
+                {modal && (
+                    <ReportComponent />
+                )}
+                </div>
         </div>
     </li>
         

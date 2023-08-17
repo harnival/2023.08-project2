@@ -71,6 +71,9 @@ export default function App(){
               <img src="/img/icons/message.svg" />
               메세지
             </li>
+            <li onClick={() => navigate('/stories')}>
+              스토리
+            </li>
           </ul>
         </div>
       </div>

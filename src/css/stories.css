@@ -1,0 +1,80 @@
+#stories{
+    min-height: 100vh;
+}
+.storiesBox {
+    width: 100%;
+    height: 100%;
+    max-width: 1280px;
+    margin: auto;
+    background-color: #eee;
+}
+
+.cmake_board{
+    margin: 5rem auto;
+    border: 2px solid black;
+    background-color: white;
+    width: 40%;
+    aspect-ratio: 1/1.2;
+    position: relative;
+}
+.cmake_board canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2000;
+}
+.cmake_board img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center center;
+}
+.cmake_tools {
+    width: 40%;
+    margin: auto;
+    display: flex;
+    justify-content: space-evenly;
+    position: relative;
+
+}
+.cmake_tools ul {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    display: flex;
+    gap: 1rem;
+    display: none;
+}
+.cmake_tools ul.showOption {
+    display: flex;
+}
+.selectedTool {
+    border: 2px solid black;
+}
+.cmake_t_pen button{
+    border: 0;
+    width: 2rem;
+    height: 2rem;
+    font-size: 0px;
+    background: url('../img/pencil.svg') no-repeat center/contain;
+}
+.cmake_t_pen li {
+    font-size: 0px;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 2;
+    box-sizing: border-box;
+}
+.cmake_t_sticker li {
+    width: 3rem;
+    height: 3rem;
+}
+
+.cmake_t_sticker li img{
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center center;
+}

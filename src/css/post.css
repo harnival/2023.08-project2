@@ -92,6 +92,14 @@
     top: 100%;
     right: 0;
 }
+.h_f_c_acc_sub_options > div > a {
+    text-align: center;
+    min-width: 5rem;
+    display: block;
+    padding: 0.5rem;
+    border: 0;
+    cursor: pointer;
+}
 .h_f_c_acc_sub_options button{
     text-align: center;
     min-width: 5rem;
@@ -317,6 +325,98 @@
 }
 
 
+.h_f_list_modal {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 0;
+    margin: auto;
+    overflow: hidden;
+    z-index: 2000;
+    transition: .3s ease;
+
+}
+.h_f_list_modal.open_modal {
+    height: 50vh;
+}
+.h_f_list_modal_report {
+    max-width: 1280px;
+    width: 100%;
+    margin: auto;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(3px);
+    border-top-left-radius: 2rem;
+    border-top-right-radius: 2rem;
+    box-shadow: 2px 1px 5px 0px rgb(0,0,0,0.6);
+}
+.h_f_close{
+    width: 100%;
+    padding: 1rem 0;
+}
+.h_f_close button{
+    display: block;
+    width: 10%;
+    margin: auto;
+    border: 0;
+    height: 10px;
+    box-shadow: inset 1px 1px 3px 0px rgb(0,0,0,0.3);
+    cursor: pointer;
+}
+.h_report > form{
+    width: min-content;
+    margin: auto;
+    border: 2px solid black;
+    border-radius: 2rem;
+    background-color: white;
+    overflow: hidden;
+}
+.h_r_s_title{
+    text-align: center;
+    font-weight: 600;
+    font-size: 100%;
+}
+.h_r_s_inputBox{
+    padding:0.5rem 2rem 2rem;
+    box-sizing: border-box;
+    width: max-content;
+    margin: auto;
+}
+.h_r_s_inputBox > li{
+    width: fit-content;
+}
+.h_r_text{
+    width: 100%;
+    border-top: 2px solid black;
+}
+.h_r_text textarea{
+    resize: none;
+    width: 100%;
+    min-height: 5rem;
+    box-sizing: border-box;
+    height: 100%;
+    display: block;
+    border: 0;
+    padding: 0.5rem 2rem;
+}
+.h_r_btn {
+    padding: 1rem 0;
+}
+.h_r_btn button {
+    display: block;
+    margin: auto;
+    border: 0;
+    padding: 0.3rem 1rem;
+    font-weight: 600;
+    background-color: transparent;
+    cursor: pointer;
+    transition: .3s ease;
+}
+.h_r_btn button:hover {
+    background-color: #aaa;
+    color: white;
+}
 /* ============================================================================= */
 @media screen and (max-width : 1023px){
     .h_f_list{

@@ -137,6 +137,7 @@ export default function Editor(){
         if(elem){
             html2canvas(elem).then((canvas) => {
                 const image = canvas.toDataURL('image/png');
+                console.log(image)
                 setimgs(state => image);
             })
         }

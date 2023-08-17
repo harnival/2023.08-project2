@@ -15,33 +15,12 @@ export default function Home(){
     const textArea = useRef()
 
     const [feedLoading, setfeedLoading] = useState(true)
-    const [modal, setmodal] = useState()
 
     const [postIds, setpostIds] = useState([]);
     const [postFeed, setpostFeed] = useState({});
     const [selectImage, setselectImage] = useState([]);
 
 
-    // useEffect(function(){   // 게시물 데이터베이스에 호출
-    //     const myGroup = Object.keys(store.getState().setCurrentUser.group)
-    //     const myFollower = store.getState().setCurrentUser.follower;        
-    //         myFollower.push(useAuth.currentUser.uid);
-    //     const q = !myGroup.length ? (
-    //         query(collection(useFirestore,'posts'),where('uid', 'in', myFollower))
-    //         ) : (
-    //         query(collection(useFirestore,'posts'),or(
-    //             where('group','in', myGroup),
-    //             where('uid', 'in',myFollower)
-    //         ))
-    //     );
-
-    //     const unsub = onSnapshot(q, (snapshotDoc) => {
-    //         const docArr = snapshotDoc.docs;
-    //         const docArr2 = [...docArr.map(v => v.id)]
-    //         setpostIds(state => docArr2)
-    //     })
-    //     return () => unsub();
-    // },[])
     useEffect(function(){   // 게시물 데이터베이스에 호출
         const myGroup = Object.keys(store.getState().setCurrentUser.group)
         const myFollower = store.getState().setCurrentUser.follower;        
@@ -253,25 +232,8 @@ export default function Home(){
     }
 
 
-    const blockUser = function(userID){ // 유저 차단 //
-        const db = doc(useFirestore,'account',useAuth.currentUser.uid);
-        updateDoc(db,{
-            block : arrayUnion(userID)
-        })
-    }
-    // const contentHeight = useRef();
-    // const commentHeight = useRef();
-    // useEffect(function(){
-    //     if(contentHeight.current && commentHeight.current){
-    //         const  hei1 = contentHeight.current.offsetHeight;
-    //         const  hei2 = commentHeight.current.offsetHeight;
-    //         if( hei1 > hei2){
-    //             commentHeight.current.style.height = `${hei1}px`
-    //         } else if(hei1 < hei2) {
-    //             contentHeight.current.style.height = `${hei2}px`
-    //         }
-    //     }
-    // },[])
+   
+
    
 // components ================================================= //
    
@@ -279,49 +241,7 @@ export default function Home(){
     const HomeUnitPostComponent = memo(PostComponent)
    
     
-    const ReportComponent = function(){
-        const close = function(e){
-            e.preventDefault();
-            setmodal(state => null)
-        }
-        const submitReport = function(){
-
-        }
-        return(
-            <div className="h_report">
-                <form>
-                    <div className="h_r_select">
-                        <div className="h_r_s_title"><span>신고 유형</span></div>
-                        <ul className="h_r_s_inputBox">
-                            <li>
-                                <input type="radio" name="type" id="report1" className='h_r_s_input'/>
-                                <label htmlFor="report1">가학적, 폭력적인 컨텐츠</label>
-                            </li>
-                            <li>
-                                <input type="radio" name="type" id="report2" className='h_r_s_input'/>
-                                <label htmlFor="report2">선정적인 컨텐츠</label>
-                            </li>
-                            <li>
-                                <input type="radio" name="type" id="report3" className='h_r_s_input'/>
-                                <label htmlFor="report3">타인을 사칭 및 비방, 괴롭힘 목적</label>
-                            </li>
-                            <li>
-                                <input type="radio" name="type" id="report4" className='h_r_s_input'/>
-                                <label htmlFor="report4">잘못된 정보, 가짜 뉴스로 혼란이 예상되는 컨텐츠</label>
-                            </li>
-                        </ul>
-                    </div>
-                    <div className="h_r_text">
-                        <textarea name="text" id="" maxLength={100} placeholder='추가 신고 내용 입력 (100자 이내)'></textarea>
-                    </div>
-                    <div className="h_r_btn">
-                        <button>제출</button>
-                        <button type='button'>닫기</button>
-                    </div>
-                </form>
-            </div>
-        )
-    }
+    
 
 // return =====================================================//
     if(feedLoading){
