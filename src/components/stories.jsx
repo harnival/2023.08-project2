@@ -1,4 +1,4 @@
-import { addDoc, arrayUnion, collection, doc, getDocs, query, updateDoc, where } from "firebase/firestore"
+import { addDoc, arrayUnion, collection, doc, getDoc, getDocs, query, updateDoc, where } from "firebase/firestore"
 import { useEffect, useRef, useState } from "react"
 import { useAuth, useFirestore } from "../datasource/firebase"
 import store from "../store/store"
@@ -9,10 +9,11 @@ import { useNavigate } from "react-router-dom";
 export default function Stories(){
     const navigate = useNavigate();
     const [userInfo, setuserInfo] = useState([])
-
+    const [stickers, setstickers] = useState([])
     useEffect(function(){
         async function load(){
             const followers = store.getState().setCurrentUser.follower;
+                followers.push(useAuth.currentUser.uid)
             const userQuery = query(collection(useFirestore,'account'),where('uid','in',followers));
             const data1 = await getDocs(userQuery);
             const data2 = data1.docs;
@@ -25,6 +26,13 @@ export default function Stories(){
             setuserInfo(state => [...data4])
         }
         load()
+        async function loadSticker(){
+            const db = doc(useFirestore,'items','sticker');
+            const data1 = await getDoc(db);
+            const data2 = data1.data();
+            setstickers(state => Object.entries(data2));
+        }
+        loadSticker()
     },[])
     // components =====================================================//
     const ComponentMain = function(){
@@ -91,7 +99,7 @@ export default function Stories(){
         useEffect(function(){
             const canvass = document.querySelector(".cmake_board canvas")
             function moveEvent(e){
-                if(mouseevent){
+                if(mouseevent && selectTool == 'pen'){
                     const can = canvass.getContext('2d');
                     if(drawOption.color === 'erase'){
                         can.globalCompositeOperation = "destination-out"
@@ -136,16 +144,42 @@ export default function Stories(){
 
         // 스티커 추가 //
         const [stickerList, setstickerList] = useState([])
-        const addSticker = function()
+        const [selectSticker, setselectSticker] = useState(null)
+        const addSticker = function(val){
+            setstickerList(state => [...stickerList, val])
+        }
         useEffect(function(){
-            const stickers = document.querySelectorAll(".cmake_b_sticker");
-            stickers.forEach(v => {     // 스티커 움직이기
-                function moveSticker(){
-                    
-                }
-                v.addEventListener('mousedown',)
+            const qq = document.querySelectorAll(".cmake_b_sticker");
+            qq.forEach(v => {
+                let keyval;
+                v.addEventListener('mousedown',function(event){
+                    keyval = true
+                    const elem = event.target;
+                    let [poLeft, poTop] = [+elem.offsetLeft, +elem.offsetTop]
+                    window.addEventListener('mousemove',function(event){
+                        if(keyval){
+                            const mx = event.movementX;
+                            const my = event.movementY;
+                            poLeft += mx; poTop += my;
+                            if(elem.offsetTop < 0){
+                                const ih = window.innerHeight;
+                                keyval = false
+                                elem.style.transition = '.3s ease'
+                                poTop = ih/2;
+                            }else{
+                                elem.style.transition = ''
+                            }
+                        }
+                        elem.style.top = `${poTop}px`
+                        elem.style.left = `${poLeft}px`
+                    })
+                })
+                window.addEventListener('mouseup',function(e){
+                    keyval = false
+                })
             })
         },[stickerList])
+       
 
         //업로드//
         const uploadStory = function(){
@@ -165,7 +199,7 @@ export default function Stories(){
                 <input ref={input => imageFile = input} type="file" name="image" id="" accept="image/.jpg,image/.png" onChange={(e) => openImage(e)}/>
                 <div className="cmake_tools">
                     <div className="cmake_t_pen">
-                        <button onClick={(e) => {e.preventDefault(); setselectTool(state => 'pen')}}>펜 도구</button>
+                        <button onClick={(e) => {e.preventDefault(); setselectTool(state => state == 'pen'? null : 'pen')}}>펜 도구</button>
                         <ul className={"pen_color " + (selectTool==='pen'? 'showOption' : '')}>
                             <li className={drawOption.color==='black'? 'selectedTool' : ''} style={{backgroundColor : 'black'}} onClick={() => setdrawOption(state => ({...state, color : 'black'}) )}>black</li>
                             <li className={drawOption.color==='red'? 'selectedTool' : ''} style={{backgroundColor : 'red'}} onClick={() => setdrawOption(state => ({...state, color : 'red'}) )}>red</li>
@@ -181,9 +215,12 @@ export default function Stories(){
                     <div className="cmake_t_sticker">
                         <button onClick={(e) => {e.preventDefault(); setselectTool(state => 'sticker')}} >스티커</button>
                         <ul className={"cmake_sticker " + (selectTool==='sticker'? 'showOption' : '')}>
-                            <li><img src="img/crown.svg" /></li>
-                            <li><img src="img/heart.svg" /></li>
-                            <li><img src="img/wizard-hat.svg" /></li>
+                           {stickers.map((v,i) => (
+                            <li onClick={() => addSticker(v[1])} key={`sticker_${i}`}>
+                                {v[0]}
+                                <img src={v[1]} />
+                            </li>
+                           ))}
                         </ul>
                     </div>
                     <div className="cmake_t_text">
@@ -192,13 +229,12 @@ export default function Stories(){
                 </div>
                 <div className="cmake_board" id="elementToCapture">
                     <img src={nowSelect} />
+                    <canvas ref={imageCanvas}></canvas>
                     {stickerList.map((v,i) => (
                         <div className="cmake_b_sticker" key={`sticker_${i}`}>
-                            <img src={v} />
+                            <img src={v} draggable="false"/>
                         </div>
                     ))}
-
-                    <canvas ref={imageCanvas}></canvas>
                 </div>
                 <div className="cmake_submit">
                     <button onClick={(e) => {e.preventDefault(); uploadStory()}}>업로드</button>

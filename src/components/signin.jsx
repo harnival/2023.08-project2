@@ -218,18 +218,31 @@ export default function Signin(){
             </form>
         )
     }
-
+    useEffect(function(){
+        const q = document.querySelectorAll(".bar_step");
+        [...q].map( (v,i) => {
+            if(i < pageNumber){
+                v.classList.add("active")
+            }else {
+                v.classList.remove("active")
+            }
+        })
+    },[pageNumber])
     return(
         <div id="signin">
+            <div className="l_bg_box">
+                <div className="bg1"></div>
+                <div className="bg2"></div>
+            </div>
            <div className="infoPageBox">
-                <p>@@@에 오신 것을 환영합니다!</p>
+                <p>RODEE에 오신 것을 환영합니다!</p>
                 <p>가입을 완료하기 전 정보를 입력해주세요.</p>
                 <div className="ip_formWrap">
                     <div className="ip_fw_bar">
-                        <div className="bar_step1"></div>
-                        <div className="bar_step2"></div>
-                        <div className="bar_step3"></div>
-                        <div className="bar_step4"></div>
+                        <div className="bar_step bar_step1"></div>
+                        <div className="bar_step bar_step2"></div>
+                        <div className="bar_step bar_step3"></div>
+                        <div className="bar_step bar_step4"></div>
                     </div>
                     <div className="ip_fw_content">
                         {pageNumber === 1? ( <Info1 inputInfo={inputInfo}/>
@@ -239,7 +252,7 @@ export default function Signin(){
                         ): pageNumber === 0? (
                             <div className="ip_goToHome">
                                 <p>가입이 완료되었습니다!</p>
-                                <p>이제부터 @@@과 함께해요!</p>
+                                <p>이제부터 RODEE과 함께해요!</p>
                                 <div className="ip_gth_btn">
                                     <a href="/#">홈 화면으로 가기</a>
                                 </div>

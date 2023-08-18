@@ -100,9 +100,12 @@ export default function Group(){
 
         const groupDB = collection(useFirestore,'groups');
         const userDB = doc(useFirestore,'account',useAuth.currentUser.uid);
+        const userData1 = await getDoc(userDB);
+        const userData2 = userData1.data();
+        const userData3 = userData2.group;
         const adddocs = await addDoc(groupDB,groupAdd);
         await updateDoc(userDB,{
-            group : arrayUnion({[adddocs.id] : groupAdd.title})
+            group : {...userData3, [adddocs.id] : groupAdd.title}
         })
         return navigate(`/group/${adddocs.id}`, {state : {data : groupAdd}})
     }
@@ -147,17 +150,9 @@ export default function Group(){
         setsearchList(state => [])
 
         const groupQuery = query(collection(useFirestore,'groups'), where('title','>=',keyword))
-        const groupQuery2 = query(collection(useFirestore,'groups'), where('description','>=',`#${keyword}`))
-        const groupQuery3 = query(collection(useFirestore,'groups'), where('description','>=',keyword))
         const data1 = await getDocs(groupQuery);
             const data1_2 =await Promise.all( data1.docs.map(v => [v.id, v.data()]))
             setsearchList(state => [...data1_2])
-        const data2 = await getDocs(groupQuery2);
-            const data2_2 =await Promise.all( data2.docs.map(v => [v.id, v.data()]))
-            setsearchList(state => [...state, ...data2_2])
-        const data3 = await getDocs(groupQuery3);
-            const data3_2 =await Promise.all( data3.docs.map(v => [v.id, v.data()]))
-            setsearchList(state => [...state, ...data3_2])
         return navigate(`/group/search/q/${keyword}`, {state : {data : searchList}});
     }
 
@@ -178,7 +173,7 @@ export default function Group(){
                                     <div className="g_b_img_wrap">
                                         <img src={v.photoURL? v.photoURL : null}/>
                                     </div>
-                                    <div className="g_b_my_alarm"></div>
+                                    {/* <div className="g_b_my_alarm"></div> */}
                                 </div>
                                 <div className="g_b_my_text">
                                     <p style={{ fontWeight : '600'}}>{v.title}</p>
@@ -219,7 +214,6 @@ export default function Group(){
                         </>
                     )}
                 </div>
-
             </div>
         )
     }
@@ -228,7 +222,7 @@ export default function Group(){
         const location = useLocation();
         const {keyword} = useParams()
         const groupData = location.state.data;
-
+        
         return(
             <div className="g_b_searchResult">
                 <div className="g_b_sr_text">
@@ -242,11 +236,11 @@ export default function Group(){
                         )}
                         {groupData.map(v => (
                             <li>
-                                <img src={v.photoURL} />
+                                <img src={v[1].photoURL} />
                                 <div className="g_b_sr_list_text">
-                                    <p>{v.title}</p>
-                                    <p>{v.description}</p>
-                                    <p>{v.user&&v.user.length}</p>
+                                    <p>{v[1].title}</p>
+                                    <p>{v[1].description}</p>
+                                    <p>{v[1].user && v[1].user.length}</p>
                                 </div>
                             </li>
                         ))}

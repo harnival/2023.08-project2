@@ -102,8 +102,10 @@ export default function GroupUnit(props) {
             user : arrayUnion(uid)
         });
         const userdb = doc(useFirestore,'account', uid);
+        const updates = {...store.getState().setCurrentUser.group}
+            updates[groupID] = pageInfo.title;
         updateDoc(userdb,{
-            group : { [groupID] : pageInfo.title }
+            group : updates
         })
     }
 

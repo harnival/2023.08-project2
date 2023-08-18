@@ -13,8 +13,8 @@
     height: 4rem;
     display: flex;
     justify-content: center;
-    /* background: linear-gradient(60deg, rgb(139, 11, 11), rgb(182, 50, 182)); */
-    background: linear-gradient(to right, rgb(28, 167, 125),rgb(23, 48, 124));
+    /* background: linear-gradient(60deg, rgb(137, 11, 11), #b632b6); */
+    background: linear-gradient(to right, #1ca77d,#17307c);
     border-bottom-left-radius: 2rem;
     border-bottom-right-radius: 2rem;
 

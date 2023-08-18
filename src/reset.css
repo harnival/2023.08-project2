@@ -1,6 +1,21 @@
-body {margin: 0; padding: 0; font-size: max(14px, 0.8vw); font-weight: 400; user-select: none; min-height: 100vh;}
+body {margin: 0; padding: 0; font-size: max(14px, 0.8vw); font-weight: 400; user-select: none; min-height: 100vh; font-family: 'KoPubWorld_Dotum', 'Sans-serif';}
 h1,h2,h3,h4,h5,h6 {padding: 0; margin: 0;}
 ul,li {list-style: none; padding: 0; margin: 0;}
 a {text-decoration: none; color: inherit;}
 p {margin: 0;}
 
+@font-face {
+    font-family: 'KoPubWorld_Dotum';
+    src: url('./font/KoPubWorld_Dotum_Light.ttf');
+    font-weight: lighter;
+}
+@font-face {
+    font-family: 'KoPubWorld_Dotum';
+    src: url('./font/KoPubWorld_Dotum_Bold.ttf');
+    font-weight: 600;
+}
+@font-face {
+    font-family: 'KoPubWorld_Dotum';
+    src: url('./font/KoPubWorld_Dotum_Medium.ttf');
+    font-weight:normal;
+}

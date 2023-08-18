@@ -80,7 +80,7 @@ export default function App(){
     )
   } else {
     return(
-      <div id="app" key={Date.now()}>
+      <div id="app" key={Date.now()} draggable="false">
           <Routes>
             <Route path='/login' element={<Login />}></Route>
             <Route path='/signin' element={<Signin />}></Route>

@@ -74,6 +74,7 @@ const registUser = function(info){
       ...generals,
       group : {},
       follower : [],
+      following:[],
       like : [],
       block : []
     })

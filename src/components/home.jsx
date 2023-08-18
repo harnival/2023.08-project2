@@ -23,7 +23,7 @@ export default function Home(){
 
     useEffect(function(){   // 게시물 데이터베이스에 호출
         const myGroup = Object.keys(store.getState().setCurrentUser.group)
-        const myFollower = store.getState().setCurrentUser.follower;        
+        const myFollower = store.getState().setCurrentUser.following
             myFollower.push(useAuth.currentUser.uid);
         const q = !myGroup.length ? (
             query(collection(useFirestore,'posts'),where('uid', 'in', myFollower))

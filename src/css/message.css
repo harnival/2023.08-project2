@@ -30,6 +30,8 @@
     padding: 0.5rem 0rem;
     border-bottom: 1px solid #eee;
     position: relative;
+    width: 100%;
+    overflow-x: auto;
 }
 .m_l_category ul {
     height: 100%;
@@ -41,6 +43,8 @@
 }
 .m_l_category li {
     padding-left: 1rem;
+    word-break: keep-all;
+    white-space: nowrap;
 }
 .m_l_category a {
     display: block;

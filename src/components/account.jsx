@@ -311,14 +311,22 @@ export default function Account(props){
     }
     const followUser = function(user){
         const db = doc(useFirestore,'account',user);
+        const mydb = doc(useFirestore,'account',useAuth.currentUser.uid)
         updateDoc(db, {
             follower : arrayUnion(useAuth.currentUser.uid)
+        })
+        updateDoc(mydb, {
+            following : arrayUnion(user)
         })
     }
     const cancelFollowUser = function(user){
         const db = doc(useFirestore,'account',user);
+        const mydb = doc(useFirestore,'account',useAuth.currentUser.uid)
         updateDoc(db, {
             follower : arrayRemove(useAuth.currentUser.uid)
+        })
+        updateDoc(mydb, {
+            following : arrayRemove(user)
         })
     }
 //  components ============================================================== //
@@ -514,7 +522,11 @@ export default function Account(props){
                                             <button type="button" onClick={() => setopenUserMenu(state => !state)}>사용자 메뉴</button>
                                             {openUserMenu && (
                                                 <ul className="acc_i_a_b_menu">
-                                                    <li><a href='/#' onClick={(e) => e.preventDefault()}>follow</a></li>
+                                                    {userInfo.follower.find(v => useAuth.currentUser.uid)? (
+                                                        <li><a href='/#' onClick={(e) => {e.preventDefault(); cancelFollowUser(userID)}}>cancel follow</a></li>
+                                                    ):(
+                                                        <li><a href='/#' onClick={(e) => {e.preventDefault(); followUser(userID)}}>follow</a></li>     
+                                                    )}
                                                     <li><a href='/#' onClick={(e) => {e.preventDefault(); sendMessage()}}>send message</a></li>
                                                     <li><a href='/#' onClick={(e) => e.preventDefault()}>group</a></li>
                                                     <li><a href='/#' onClick={(e) => e.preventDefault()}>block</a></li>
@@ -535,7 +547,7 @@ export default function Account(props){
                             {userID !== useAuth.currentUser.uid? (
                                 <div className="acc_i_followBtn">
                                     {userInfo.follower && userInfo.follower.includes(useAuth.currentUser.uid)? (
-                                        <a href="/#" className='acc_i_f_cancel'>cancel follow</a>
+                                        <a href="/#" className='acc_i_f_cancel' onClick={(e) => {e.preventDefault(); cancelFollowUser(userID)}}>cancel follow</a>
                                     ):(
                                         <a href="/#" className='acc_i_f_follow' onClick={(e) => {e.preventDefault(); followUser(userID)}}>follow</a>
                                     )}
