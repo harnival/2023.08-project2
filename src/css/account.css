@@ -210,12 +210,7 @@
     font-size: 80%;
     color: #444;
 }
-.acc_f_c_acc_sub {
-    position: absolute;
-    right: 0;
-    font-size: 80%;
-    color: #444;
-}
+
 .acc_f_c_text {
     min-height: 1rem;
     width: 90%;
@@ -288,7 +283,7 @@
 }
 .acc_f_c_acc_sub > span {
     font-size: 80%;
-    color: #444;
+    color: black;
 }
 .acc_f_c_acc_sub_options {
     background-color: white;

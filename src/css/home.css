@@ -1,8 +1,9 @@
 .homeBox {
     max-width: 1280px;
-    background-color: #eee;
+    background-color: rgba(238, 238, 238, 0.4);
     margin: auto;
     min-height: 100vh;
+    backdrop-filter: brightness(100%);
 }
 .h_new{
     width: 80%;
@@ -161,9 +162,9 @@
 /* ==================================================================== */
 
 @media screen and (max-width: 1023px) {
-    .homeBox {
+    .homeBox {  
         max-width:none;
-        background-color: #eee;
+    background-color: rgba(238, 238, 238, 0.4);
         /* height: 100vh; */
         margin: auto;
         min-height: 95vh;

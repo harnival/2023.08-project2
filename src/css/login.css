@@ -71,9 +71,11 @@
     height: 15vw;
     border-radius: 20%;
     overflow: hidden;
-    border: 6px solid black;
+    border: 6px solid rgba(0, 0, 0, 0.5);
     box-sizing: border-box;
-    background-color: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 .lf_icon_box img{
     width: 100%;
@@ -85,6 +87,7 @@
 }
 .lf_icon_title img {
     width: 100%;
+    opacity: 0.7;
 }
 
 .loginForm {

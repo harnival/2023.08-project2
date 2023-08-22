@@ -25,7 +25,7 @@ export default function Login(){
             <div className="loginFormWrap">
                 <div className="lf_icon">
                     <div className="lf_icon_box">
-                        <img src="img/icons/rodent-icon3.png" />
+                        <img src="img/icons/rodent-icon.png" />
                     </div>
                     <div className="lf_icon_title">
                         <img src="img/icons/title2.png" />

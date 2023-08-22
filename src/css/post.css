@@ -83,7 +83,8 @@
 }
 .h_f_c_acc_sub > span {
     font-size: 80%;
-    color: #444;
+    /* color: #444; */
+    color: black;
 }
 .h_f_c_acc_sub_options {
     background-color: white;
@@ -422,7 +423,6 @@
     .h_f_list{
     width: 80%;
     margin: auto;
-    /* background-color: white; */
     padding: 2rem 0;
 }
 .h_f_list_box{
@@ -580,8 +580,8 @@
 }
 .h_f_c_image_unit {
     height: 100%;
-    width: calc( 100vw * 0.8 * 0.64);
-    max-width: calc( 1280px * 0.8 * 0.64 );
+    width: calc( 100vw * 0.8 );
+    max-width: none;
     min-width: 50vh;
     background-color: black;
     box-sizing: border-box;
